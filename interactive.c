@@ -156,7 +156,7 @@ InteractiveHeaders(Dev, StdIO);
 // move cursor in case 'InteractiveWifiScan' asks for a root password,
 //otherwise we will overwrite the Title bar with the request
 TerminalCursorMove(StdIO, 0, 6);
-Menu=TerminalMenuCreate(StdIO, 2, 7, wid - 4, len - 10);
+Menu=TerminalMenuCreate(StdIO, 2, 7, wid - 4, len - 11);
 InteractiveWifiScan(Dev, Menu);
 
 //clear any leftover text from password query
@@ -178,7 +178,9 @@ while (1)
 	InteractiveHeaders(Dev, StdIO);
 	TerminalMenuDraw(Menu);
 	TerminalCursorMove(StdIO, 0, len-2);
-	TerminalPutStr("~B~wKeys:  up-arrow/down-arrow:select network   Enter:join network   f:forget network~>\r\n       s:Scan again   d:disconnect   escape-escape:exit~>~0", StdIO);
+	TerminalPutStr("~B~wKeys: up/down-arrow:select network  Enter:join network  f:forget network~>~0", StdIO);
+	TerminalCursorMove(StdIO, 0, len-1);
+  TerminalPutStr("~B~w      s:Scan again   d:disconnect   escape-escape:exit~>~0", StdIO);
 
 	ch=TerminalReadChar(StdIO);
 	if (ch==ESCAPE) break;

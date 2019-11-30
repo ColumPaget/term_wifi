@@ -1,15 +1,15 @@
 VERSION=1.0
 CC=gcc
-LIBS=  libUseful/libUseful.a
+LIBS=  libUseful-4/libUseful.a
 FLAGS=-g -O2 -DVERSION=\"$(VERSION)\"
 
 OBJ=common.o net.o runcommand.o iw.o wireless_tools.o wpa_supplicant.o wifi.o interactive.o settings.o 
 
-all: $(OBJ) libUseful/libUseful.a
+all: $(OBJ) libUseful-4/libUseful.a
 	$(CC) $(FLAGS)  -oterm_wifi $(OBJ) main.c $(LIBS)
 
-libUseful/libUseful.a:
-	$(MAKE) -C libUseful
+libUseful-4/libUseful.a:
+	$(MAKE) -C libUseful-4
 
 common.o: common.h common.c common.h
 	$(CC) $(FLAGS)  -c common.c
@@ -40,4 +40,7 @@ settings.o: settings.h settings.c common.h
 
 
 clean:
-	rm *.o libUseful/*.o libUseful/*.a libUseful/*.so
+	rm *.o libUseful-4/*.o libUseful-4/*.a libUseful-4/*.so
+
+test:
+	echo "no tests"

@@ -427,7 +427,7 @@ Copyright (C) 2012 Free Software Foundation, Inc.
 This config.status script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it."
 
-ac_pwd='/home/colum/term_wifi'
+ac_pwd='/home/user1/term_wifi'
 srcdir='.'
 test -n "$AWK" || AWK=awk
 # The default lists apply if the user does not specify any file.
@@ -583,8 +583,8 @@ echo 'BEGIN {' >"$ac_tmp/subs1.awk" &&
 cat >>"$ac_tmp/subs1.awk" <<\_ACAWK &&
 S["LTLIBOBJS"]=""
 S["LIBOBJS"]=""
-S["subdirs"]=" libUseful"
-S["STATIC_LIBS"]="libUseful/libUseful.a"
+S["subdirs"]=" libUseful-4"
+S["STATIC_LIBS"]="libUseful-4/libUseful.a"
 S["EGREP"]="/bin/grep -E"
 S["GREP"]="/bin/grep"
 S["CPP"]="gcc -E"
