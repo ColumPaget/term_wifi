@@ -129,8 +129,6 @@ if (S)
 			STREAMWriteLine(Tempstr, S);
 		}
 
-
-
 		if (StrValid(Net->AccessPoint))
 		{
 			Tempstr=MCopyStr(Tempstr, "accesspoint ", Net->AccessPoint, "\n", NULL);
@@ -200,6 +198,7 @@ tmpNet->Address=CopyStr(tmpNet->Address, Net->Address);
 tmpNet->Netmask=CopyStr(tmpNet->Netmask, Net->Netmask);
 tmpNet->Gateway=CopyStr(tmpNet->Gateway, Net->Gateway);
 tmpNet->DNSServer=CopyStr(tmpNet->DNSServer, Net->DNSServer);
+tmpNet->AccessPoint=CopyStr(tmpNet->AccessPoint, Net->AccessPoint);
 ListAddNamedItem(Nets, tmpNet->ESSID, tmpNet);
 
 SettingsSaveNets(Nets);

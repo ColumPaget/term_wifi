@@ -45,11 +45,13 @@ float dBm;
 
 
 extern ListNode *ConfiguredNets;
+extern STREAM *StdIO;
 
 typedef void (*INTERACTIVE_STATUS_CALLBACK)(TNetDev *Dev, const char *Text);
 
 extern INTERACTIVE_STATUS_CALLBACK DisplayStatus;
 void PidFileKill(const char *AppName);
+TNet *NetCreate();
 void NetDestroy(void *p_Net);
 
 const char *OutputNetQualityColor(TNet *Net);

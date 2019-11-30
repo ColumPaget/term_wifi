@@ -65,12 +65,22 @@ else if (strcmp(ptr, "join")==0)
 
 	Conf->ESSID=CopyStr(Conf->ESSID, CommandLineNext(CL));
 }
+else if (strcmp(ptr, "leave")==0) 
+{
+	Act=ACT_LEAVE;
+	Conf->Interface=CopyStr(Conf->Interface, CommandLineNext(CL));
+	if (! ListFindNamedItem(Interfaces, Conf->Interface))
+	{
+			printf("ERROR: '%s' is not an interface\n", Conf->Interface);
+			printf("usage: %s join <interface> <essid>\n", argv[0]);
+			exit(1);
+	}
+}
 else if (strcmp(ptr, "forget")==0) 
 {
 	Act=ACT_FORGET;
 	Conf->ESSID=CopyStr(Conf->ESSID, CommandLineNext(CL));
 }
-else if (strcmp(ptr, "leave")==0) Act=ACT_LEAVE;
 else if (strcmp(ptr, "help")==0) Act=ACT_HELP;
 else if (strcmp(ptr, "-?")==0) Act=ACT_HELP;
 else if (strcmp(ptr, "-h")==0) Act=ACT_HELP;
@@ -82,7 +92,7 @@ ptr=CommandLineNext(CL);
 while (ptr)
 {
 	if (strcmp(ptr, "-i")==0) Conf->Interface=CopyStr(Conf->Interface, CommandLineNext(CL));
-	else if (strcmp(ptr, "-a")==0) Conf->Address=CopyStr(Conf->Address, CommandLineNext(CL));
+	else if (strcmp(ptr, "-ap")==0) Conf->AccessPoint=CopyStr(Conf->AccessPoint, CommandLineNext(CL));
 	else if (strcmp(ptr, "-k")==0) Conf->Key=CopyStr(Conf->Key, CommandLineNext(CL));
 	else if (strcmp(ptr, "-?")==0) Act=ACT_HELP;
 	else if (strcmp(ptr, "-h")==0) Act=ACT_HELP;
@@ -119,12 +129,10 @@ void ScanForNetworks(TNetDev *Dev)
 {
 ListNode *Networks, *Curr;
 char *Tempstr=NULL, *Output=NULL;
-STREAM *Out;
 TNet *Net;
 
 ConfiguredNets=SettingsLoadNets(NULL);
 Networks=WifiGetNetworks(Dev);
-Out=STREAMFromFD(1);
 Curr=ListGetNext(Networks);
 while (Curr)
 {
@@ -132,12 +140,11 @@ Net=(TNet *) Curr->Item;
 
 Output=OutputFormatNet(Output, Net);
 Output=CatStr(Output, "\n");
-TerminalPutStr(Output, Out);
+TerminalPutStr(Output, StdIO);
 Curr=ListGetNext(Curr);
 }
 
 ListDestroy(ConfiguredNets, NetDestroy);
-STREAMDestroy(Out);
 
 Destroy(Tempstr);
 Destroy(Output);
@@ -162,18 +169,18 @@ int main(int argc, char *argv[])
 {
 ListNode *Networks, *Curr;
 char *Tempstr=NULL;
-TNet *Net, *Conf;
+TNet *Conf;
 int Action;
 TNetDev *Dev;
 
+StdIO=STREAMFromDualFD(0, 1);
 SettingsInit();
 CommandsInit();
 
 Interfaces=ListCreate();
 NetGetInterfaces(Interfaces);
 
-
-Conf=(TNet *) calloc(1, sizeof(TNet));
+Conf=NetCreate();
 Action=ParseCommandLine(argc, argv, Conf);
 
 if (StrValid(Conf->Interface)) Curr=ListFindNamedItem(Interfaces, Conf->Interface);
@@ -185,6 +192,7 @@ if (Curr)
 	switch (Action)
 	{
 	case ACT_ADD:
+		if (! StrValid(Conf->Key)) Conf->Key=TerminalReadPrompt(Conf->Key, "Key/password: ", 0, StdIO);
 		SettingsConfigureNet(Conf);
 		SettingsSaveNet(Conf);
 	break;
@@ -193,6 +201,7 @@ if (Curr)
 		SettingsConfigureNet(Conf);
 		if (Dev->Flags & DEV_WIFI) 
 		{
+			if (! StrValid(Conf->Key)) Conf->Key=TerminalReadPrompt(Conf->Key, "Key/password: ", 0, StdIO);
 			printf("Configure wifi: dev:%s essid:%s\n", Conf->Interface, Conf->ESSID);
 			WifiSetup(Dev, Conf);
 		}

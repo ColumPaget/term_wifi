@@ -4,6 +4,7 @@
 
 INTERACTIVE_STATUS_CALLBACK DisplayStatus=NULL;
 ListNode *ConfiguredNets=NULL;
+STREAM *StdIO=NULL;
 
 void SendSignal(pid_t pid, int Sig)
 {
@@ -60,6 +61,24 @@ STREAMDestroy(S);
 }
 
 
+
+TNet *NetCreate()
+{
+TNet *Net;
+
+Net=(TNet *) calloc(1, sizeof(TNet));
+Net->Interface=CopyStr(Net->Interface, "");
+Net->ESSID=CopyStr(Net->ESSID, "");
+Net->Address=CopyStr(Net->Address, "");
+Net->Netmask=CopyStr(Net->Netmask, "");
+Net->Key=CopyStr(Net->Key, "");
+Net->AccessPoint=CopyStr(Net->AccessPoint, "");
+
+return(Net);
+}
+
+
+
 void NetDestroy(void *p_Net)
 {
 TNet *Net;
@@ -68,6 +87,7 @@ Net=(TNet *) p_Net;
 
 Destroy(Net->Interface);
 Destroy(Net->ESSID);
+Destroy(Net->AccessPoint);
 Destroy(Net->Address);
 Destroy(Net->Netmask);
 Destroy(Net->Gateway);
