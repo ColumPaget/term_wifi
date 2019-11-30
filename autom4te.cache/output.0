@@ -652,7 +652,7 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CPP'
-ac_subdirs_all='libUseful'
+ac_subdirs_all='libUseful-4'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -3512,7 +3512,7 @@ fi
 LUSEFUL="system"
 else
 LUSEFUL="bundled"
-STATIC_LIBS="libUseful/libUseful.a"
+STATIC_LIBS="libUseful-4/libUseful.a"
 
 ac_aux_dir=
 for ac_dir in "$srcdir" "$srcdir/.." "$srcdir/../.."; do
@@ -3545,7 +3545,7 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 
 
-subdirs="$subdirs libUseful"
+subdirs="$subdirs libUseful-4"
 
 fi
 
