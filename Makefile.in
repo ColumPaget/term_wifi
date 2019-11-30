@@ -41,3 +41,6 @@ settings.o: settings.h settings.c common.h
 
 clean:
 	rm *.o libUseful/*.o libUseful/*.a libUseful/*.so
+
+test:
+	echo "no tests"
