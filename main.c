@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
 {
 ListNode *Networks, *Curr;
 char *Tempstr=NULL;
-TNet *Conf;
+TNet *Conf, *Net;
 int Action;
 TNetDev *Dev;
 
@@ -205,6 +205,14 @@ if (Curr)
 			printf("Configure wifi: dev:%s essid:%s\n", Conf->Interface, Conf->ESSID);
 			WifiSetup(Dev, Conf);
 		}
+
+		Net=(TNet *) calloc(1, sizeof(TNet));
+		while (1)
+		{
+		WifiGetStatus(Dev, Net);
+		if (Net->Flags & NET_ASSOCIATED) break;
+		}
+		NetDestroy(Net);
 
 		printf("Configure IPv4: ip:%s netmask:%s gw:%s dns:%s\n", Conf->Address, Conf->Netmask, Conf->Gateway, Conf->DNSServer);
 		NetSetupInterface(Dev, Conf->Address, Conf->Netmask, Conf->Gateway, Conf->DNSServer);

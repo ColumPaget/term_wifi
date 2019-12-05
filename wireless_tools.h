@@ -7,7 +7,7 @@
 int WirelessToolsGetNetworks(TNetDev *Dev, ListNode *Networks);
 int WirelessToolsSetupInterface(TNetDev *Dev, TNet *Conf);
 
-void WirelessToolsGetStatus(TNetDev *Device, TNet *Net);
+int WirelessToolsGetStatus(TNetDev *Device, TNet *Net);
 
 
 #endif

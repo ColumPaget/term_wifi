@@ -287,17 +287,19 @@ Destroy(Token);
 }
 
 
-//IW config, at the wifi level
-void WirelessToolsGetStatus(TNetDev *Device, TNet *Net)
+int WirelessToolsGetStatus(TNetDev *Device, TNet *Net)
 {
 char *Tempstr=NULL, *Output=NULL, *Line=NULL;
 const char *ptr;
+int result=FALSE;
 
 if (! Device) return;
 
 Tempstr=MCopyStr(Tempstr, "iwconfig ", Device->Name, NULL);
 Output=RunCommand(Output, Tempstr, 0);
 
+if (StrValid(Output))
+{
 ptr=GetToken(Output, "\n", &Line, 0);
 while (ptr)
 {
@@ -314,9 +316,14 @@ if (
 		) Net->Flags &= ~NET_ASSOCIATED;
 		else Net->Flags |= NET_ASSOCIATED;
 
+		result=TRUE;
+}
+
 Destroy(Line);
 Destroy(Output);
 Destroy(Tempstr);
+
+return(result);
 }
 
 

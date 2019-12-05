@@ -5,12 +5,10 @@
 
 
 
-static void InteractiveHeaders(TNetDev *Dev, STREAM *Out)
+static void InteractiveHeaders(TNetDev *Dev, TNet *Net, STREAM *Out)
 {
 char *Line=NULL, *Tempstr=NULL;
-TNet *Net;
 
-Net=(TNet *) calloc(1, sizeof(TNet));
 WifiGetStatus(Dev, Net);
 NetGetStatus(Dev, Net);
 
@@ -28,7 +26,6 @@ Line=CatStr(Line, "\n\n");
 
 TerminalPutStr(Line, Out);
 
-NetDestroy(Net);
 Destroy(Tempstr);
 Destroy(Line);
 }
@@ -74,15 +71,19 @@ Destroy(Tempstr);
 
 void InteractiveTitleBar(TNetDev *Dev, const char *Str)
 {
+TNet *Net;
 char *Tempstr=NULL;
 
 TerminalCursorMove(StdIO, 0, 0);
 Tempstr=MCopyStr(Tempstr, Str, "~>~0", NULL);
 TerminalPutStr(Tempstr, StdIO);
 
-InteractiveHeaders(Dev, StdIO);
+
+Net=(TNet *) calloc(1, sizeof(TNet));
+InteractiveHeaders(Dev, Net, StdIO);
 
 Destroy(Tempstr);
+NetDestroy(Net);
 }
 
 
@@ -133,6 +134,31 @@ Destroy(Tempstr);
 }
 
 
+void InteractiveJoinNetwork(TNetDev *Dev, TNet *Conf, STREAM *Out)
+{
+TNet *Net;
+
+	Net=(TNet *) calloc(1, sizeof(TNet));
+
+	InteractiveTitleBar(Dev, "~M~w joining network");
+	WifiSetup(Dev, Conf);
+	while (1)
+	{		
+		usleep(20000);
+
+		InteractiveHeaders(Dev, Net, Out);
+		if (Net->Flags & NET_ASSOCIATED) 
+		{
+				NetSetupInterface(Dev, Conf->Address, Conf->Netmask, Conf->Gateway, Conf->DNSServer);
+				break;
+		}
+	}
+
+	InteractiveTitleBar(Dev, "~B~w done");
+	NetDestroy(Net);
+}
+
+
 
 void Interactive(TNetDev *Dev)
 {
@@ -151,7 +177,6 @@ TerminalGeometry(StdIO, &wid, &len);
 DisplayStatus=InteractiveTitleBar;
 
 InteractiveTitleBar(Dev, "~R~w Please wait, scanning for wireless networks");
-InteractiveHeaders(Dev, StdIO);
 
 // move cursor in case 'InteractiveWifiScan' asks for a root password,
 //otherwise we will overwrite the Title bar with the request
@@ -167,15 +192,13 @@ TerminalPutStr("~>\n~>\n~>\n~>\n", StdIO);
 TerminalCursorMove(StdIO, 0, 6);
 TerminalPutStr("  Available networks: Those marked with a leading '*' have saved configs", StdIO);
 
-Tempstr=FormatStr(Tempstr, "~B~w %d wireless networks found", ListSize(Menu->Options));
-InteractiveTitleBar(Dev, Tempstr);
-
 Menu->MenuAttribs=CopyStr(Menu->MenuAttribs, "~N~w");
 
 STREAMSetTimeout(StdIO, 200);
 while (1)
 {
-	InteractiveHeaders(Dev, StdIO);
+	Tempstr=FormatStr(Tempstr, "~B~w %d wireless networks found", ListSize(Menu->Options));
+	InteractiveTitleBar(Dev, Tempstr);
 	TerminalMenuDraw(Menu);
 	TerminalCursorMove(StdIO, 0, len-2);
 	TerminalPutStr("~B~wKeys: up/down-arrow:select network  Enter:join network  f:forget network~>~0", StdIO);
@@ -206,17 +229,11 @@ while (1)
 		if (! StrValid(Net->Address)) 
 		{
 			InteractiveQueryNetConfig(Dev, Net);
-			InteractiveHeaders(Dev, StdIO);
 			InteractiveWifiMenuUpdate(Menu);
 			TerminalMenuDraw(Menu);
 		}
 
-		InteractiveTitleBar(Dev, "~M~w joining network");
-		WifiSetup(Dev, Net);
-		usleep(20000);
-		NetSetupInterface(Dev, Net->Address, Net->Netmask, Net->Gateway, Net->DNSServer);
-
-		InteractiveTitleBar(Dev, "~B~w done");
+		InteractiveJoinNetwork(Dev, Net, StdIO);
 	}
 	}
 }
