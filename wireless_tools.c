@@ -293,7 +293,7 @@ char *Tempstr=NULL, *Output=NULL, *Line=NULL;
 const char *ptr;
 int result=FALSE;
 
-if (! Device) return;
+if (! Device) return(FALSE);
 
 Tempstr=MCopyStr(Tempstr, "iwconfig ", Device->Name, NULL);
 Output=RunCommand(Output, Tempstr, 0);
