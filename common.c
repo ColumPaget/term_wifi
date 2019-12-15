@@ -60,6 +60,10 @@ StripCRLF(Settings.RootPassword);
 STREAMDestroy(S);
 }
 
+int FrequencyToChannel(int freq)
+{
+return( (freq - 2412) / 5 + 1);
+}
 
 
 TNet *NetCreate()

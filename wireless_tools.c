@@ -149,6 +149,7 @@ return(result);
 int WirelessToolsSetupInterface(TNetDev *Dev, TNet *Conf)
 {
 char *Tempstr=NULL, *Cmd=NULL;
+int RetVal=FALSE;
 
 Cmd=MCopyStr(Cmd, "iwconfig ", Dev->Name, " essid \"", Conf->ESSID, "\" ", NULL);
 
@@ -166,10 +167,14 @@ if (! (Conf->Flags & (NET_WPA1 | NET_WPA2))) Cmd=MCatStr(Cmd, " key ", Conf->Key
 else Cmd=CatStr(Cmd, " key off ");
 
 Tempstr=RunCommand(Tempstr, Cmd, RUNCMD_ROOT);
+if (Tempstr != NULL) RetVal=TRUE;
 
 Destroy(Tempstr);
 Destroy(Cmd);
+
+return(RetVal);
 }
+
 
 /*
 void WifiSetRate(TNetDev *Dev, int Rate)

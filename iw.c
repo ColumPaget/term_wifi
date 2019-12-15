@@ -110,37 +110,54 @@ Destroy(Tempstr);
 Destroy(Cmd);
 }
 
+void IWGetStatusParseLine(TNet *Net, const char *Line)
+{
+char *Token=NULL;
+const char *ptr;
 
+ptr=GetToken(Line, "\\S", &Token, 0);
+if (strcmp(Token, "Connected")==0) 
+{
+	ptr=GetToken(ptr, "\\S", &Token, 0); // 'to' of 'Connected to'
+	ptr=GetToken(ptr, "\\S", &Net->AccessPoint, 0); 
+	Net->Flags |= NET_ASSOCIATED;
+}
+else if (strcasecmp(Token, "ssid:")==0) Net->ESSID=CopyStr(Net->ESSID, ptr);
+else if (strcasecmp(Token, "signal:")==0) Net->dBm=strtol(ptr, NULL, 10);
+else if (strcasecmp(Token, "freq:")==0) Net->Channel=FrequencyToChannel(strtol(ptr, NULL, 10));
+
+Destroy(Token);
+}
 
 
 //IW config, at the wifi level
-void IWGetStatus(TNetDev *Device, TNet *Net)
+int IWGetStatus(TNetDev *Device, TNet *Net)
 {
 char *Tempstr=NULL, *Output=NULL, *Line=NULL;
 const char *ptr;
+int RetVal=FALSE;
 
-if (! Device) return;
+if (! Device) return(FALSE);
 
-Tempstr=MCopyStr(Tempstr, "iwconfig ", Device->Name, NULL);
+Tempstr=MCopyStr(Tempstr, "iw dev ", Device->Name, " link", NULL);
 Output=RunCommand(Output, Tempstr, 0);
-
-/*
+//NULL means command failed to run
+if (Output !=NULL) 
+{
+Net->Flags &= ~NET_ASSOCIATED;
 ptr=GetToken(Output, "\n", &Line, 0);
 while (ptr)
 {
 	StripTrailingWhitespace(Line);
+	StripLeadingWhitespace(Line);
 	
-	WirelessToolsGetStatusParseLine(Net, Line);
+	IWGetStatusParseLine(Net, Line);
 	ptr=GetToken(ptr, "\n", &Line, 0);
 }
 
+RetVal=TRUE;
+}
 
-if (
-        (! StrValid(Net->AccessPoint)) ||
-        (strcasecmp(Net->AccessPoint,"not-associated")==0) 
-		) Net->Flags &= ~NET_ASSOCIATED;
-		else Net->Flags |= NET_ASSOCIATED;
-*/
 
 Destroy(Line);
 Destroy(Output);

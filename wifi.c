@@ -129,7 +129,13 @@ if (Net)
 }
 
 if (Conf->Flags & (NET_RSN | NET_WPA1 | NET_WPA2)) WPASupplicantActivate(Dev, Conf);
-else WirelessToolsSetupInterface(Dev, Conf);
+else 
+{
+	if (! WirelessToolsSetupInterface(Dev, Conf))
+	{
+		IWSetupInterface(Dev, Conf);
+	}
+}
 
 ListDestroy(Networks, NetDestroy);
 ListDestroy(Configs, NetDestroy);
@@ -143,6 +149,10 @@ return(result);
 
 void WifiGetStatus(TNetDev *Device, TNet *Net)
 {
-WirelessToolsGetStatus(Device, Net);
+if (! WirelessToolsGetStatus(Device, Net))
+{
+	//if wireless tools is not installed, then try using iw
+	IWGetStatus(Device, Net);
+}
 }
 
