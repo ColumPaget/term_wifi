@@ -8,11 +8,12 @@
 #define NET_WPA1 1
 #define NET_WPA2 2
 #define NET_RSN  4
-#define NET_ENCRYPTED 32
+#define NET_WEP 32
 #define NET_ADHOC 128
 #define NET_STORE 2048
 #define NET_ASSOCIATED 4096
 
+#define NET_ENCRYPTED (NET_WPA1 | NET_WPA2 | NET_RSN | NET_WEP)
 
 
 #define DEV_WIFI 1

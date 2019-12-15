@@ -93,7 +93,7 @@ const char *ptr;
 	}
 	else if (strcmp(Key, "Encryption key")==0) 
 	{
-		if (strcmp(ptr, "on")==0) Net->Flags |=NET_ENCRYPTED;
+		if (strcmp(ptr, "on")==0) Net->Flags |=NET_WEP;
 	}
 	else if (strcmp(Key, "Bit Rates")==0) WirelessToolsParseBitRates(Net, ptr);
 
@@ -163,6 +163,7 @@ if (StrValid(Conf->Key))
 Cmd=CatStr(Cmd, " restricted ");
 if (! (Conf->Flags & (NET_WPA1 | NET_WPA2))) Cmd=MCatStr(Cmd, " key ", Conf->Key, NULL);
 }
+else Cmd=CatStr(Cmd, " key off ");
 
 Tempstr=RunCommand(Tempstr, Cmd, RUNCMD_ROOT);
 

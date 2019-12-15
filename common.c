@@ -122,7 +122,7 @@ else Output=CopyStr(Output, "  ");
 if (Net->Flags & NET_RSN) Output=CatStr(Output, "~gRSN~0 ");
 else if (Net->Flags & NET_WPA2) Output=CatStr(Output, "~gWPA2~0 ");
 else if (Net->Flags & NET_WPA1) Output=CatStr(Output, "~gWPA1~0 ");
-else if (Net->Flags & NET_ENCRYPTED) Output=CatStr(Output, "~bWEP~0  ");
+else if (Net->Flags & NET_WEP) Output=CatStr(Output, "~bWEP~0  ");
 else Output=CatStr(Output, "~rOPEN~0 ");
 
 if (Net->Quality > 0)

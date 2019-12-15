@@ -129,6 +129,7 @@ if (Net)
 }
 
 if (Conf->Flags & (NET_RSN | NET_WPA1 | NET_WPA2)) WPASupplicantActivate(Dev, Conf);
+else WirelessToolsSetupInterface(Dev, Conf);
 
 ListDestroy(Networks, NetDestroy);
 ListDestroy(Configs, NetDestroy);

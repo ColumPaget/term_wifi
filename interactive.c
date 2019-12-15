@@ -96,10 +96,15 @@ TerminalCursorMove(StdIO, 0, 0);
 TerminalPutStr("~M~w Please enter config for wireless network~>~0", StdIO);
 
 TerminalCursorMove(StdIO, 0, 2);
+
+if (Net->Flags & NET_ENCRYPTED)
+{
 Net->Key=TerminalReadPrompt(Net->Key, "Key/password: ", 0, StdIO);
 StripCRLF(Net->Key);
 
 TerminalPutStr("\n", StdIO);
+}
+
 Net->Address=TerminalReadPrompt(Net->Address, "Address (blank for DHCP): ", 0, StdIO);
 StripCRLF(Net->Address);
 
