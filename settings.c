@@ -61,6 +61,7 @@ if (S)
 		if (strcmp(Token, "wpa1")==0) Net->Flags |= NET_WPA1;
 		if (strcmp(Token, "wpa1")==0) Net->Flags |= NET_WPA1;
 		if (strcmp(Token, "rsn")==0) Net->Flags |= NET_RSN;
+		if (strcmp(Token, "user")==0) Net->UserID=CopyStr(Net->UserID, ptr);
 		if (strcmp(Token, "key")==0) Net->Key=CopyStr(Net->Key, ptr);
 		if (strcmp(Token, "address")==0) Net->Address=CopyStr(Net->Address, ptr);
 		if (strcmp(Token, "netmask")==0) Net->Netmask=CopyStr(Net->Netmask, ptr);
@@ -106,8 +107,12 @@ if (S)
 		if (Net->Flags & NET_WPA2) STREAMWriteLine("wpa2\n", S);
 		if (Net->Flags & NET_WPA1) STREAMWriteLine("wpa1\n", S);
 
+		Tempstr=MCopyStr(Tempstr, "user ", Net->UserID, "\n", NULL);
+		STREAMWriteLine(Tempstr, S);
+	
 		Tempstr=MCopyStr(Tempstr, "key ", Net->Key, "\n", NULL);
 		STREAMWriteLine(Tempstr, S);
+
 		Tempstr=MCopyStr(Tempstr, "address ", Net->Address, "\n", NULL);
 		STREAMWriteLine(Tempstr, S);
 
@@ -174,6 +179,7 @@ if (! Found)
 if (Found)
 {
 	if (! StrValid(Net->Key)) Net->Key=CopyStr(Net->Key, Found->Key);
+	if (! StrValid(Net->UserID)) Net->UserID=CopyStr(Net->UserID, Found->UserID);
 	if (! StrValid(Net->Address)) Net->Address=CopyStr(Net->Address, Found->Address);
 	if (! StrValid(Net->Netmask)) Net->Netmask=CopyStr(Net->Netmask, Found->Netmask);
 	if (! StrValid(Net->Gateway)) Net->Gateway=CopyStr(Net->Gateway, Found->Gateway);
@@ -193,6 +199,7 @@ TNet *tmpNet;
 Nets=SettingsLoadNets(NULL);
 tmpNet=(TNet *) calloc(1, sizeof(TNet));
 tmpNet->ESSID=CopyStr(tmpNet->ESSID, Net->ESSID);
+tmpNet->UserID=CopyStr(tmpNet->UserID, Net->UserID);
 tmpNet->Key=CopyStr(tmpNet->Key, Net->Key);
 tmpNet->Address=CopyStr(tmpNet->Address, Net->Address);
 tmpNet->Netmask=CopyStr(tmpNet->Netmask, Net->Netmask);

@@ -99,6 +99,11 @@ TerminalCursorMove(StdIO, 0, 2);
 
 if (Net->Flags & NET_ENCRYPTED)
 {
+Net->UserID=TerminalReadPrompt(Net->UserID, "Username (blank for none): ", 0, StdIO);
+StripCRLF(Net->UserID);
+TerminalPutStr("\n", StdIO);
+
+
 Net->Key=TerminalReadPrompt(Net->Key, "Key/password: ", 0, StdIO);
 StripCRLF(Net->Key);
 
@@ -146,15 +151,17 @@ TNet *Net;
 	Net=(TNet *) calloc(1, sizeof(TNet));
 
 	InteractiveTitleBar(Dev, "~M~w joining network");
-	WifiSetup(Dev, Conf);
 	while (1)
 	{		
-		usleep(20000);
+		WifiSetup(Dev, Conf);
+		usleep(250000);
 
 		InteractiveHeaders(Dev, Net, Out);
 		if (Net->Flags & NET_ASSOCIATED) 
 		{
+				usleep(10000); //if we've just associated then allow some time for the process to complete
 				NetSetupInterface(Dev, Conf->Address, Conf->Netmask, Conf->Gateway, Conf->DNSServer);
+				Net->Flags &= ~NET_JOINING;
 				break;
 		}
 	}

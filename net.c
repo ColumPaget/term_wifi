@@ -58,8 +58,7 @@ if ( StrValid(Address) && (strcmp(Address, "dhcp")==0) )
 	if (CommandFound("dhcpcd")) Tempstr=MCopyStr(Tempstr, "dhcpcd ", Interface->Name, " -h ", OSSysInfoString(OSINFO_HOSTNAME), NULL);
 	else Tempstr=MCopyStr(Tempstr, "dhclient ", Interface->Name, " -pf ", Settings.PidsDir, "dhclient-", Interface->Name, ".pid", NULL);
 
-	Tempstr=CatStr(Tempstr, " &> /dev/null");
-	Output=RunCommand(Output, Tempstr, RUNCMD_ROOT);
+	Output=RunCommand(Output, Tempstr, RUNCMD_ROOT | RUNCMD_NOSHELL);
 }
 else
 {

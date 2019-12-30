@@ -14,8 +14,9 @@ Curr=ListGetNext(Networks);
 while (Curr)
 {
 	Found=(TNet *) Curr->Item;
+
 	if (
-			(MatchAP && (strcasecmp(Found->AccessPoint, Net->AccessPoint)==0) ) ||
+			(MatchAP && Found->AccessPoint && Net->AccessPoint && (strcasecmp(Found->AccessPoint, Net->AccessPoint)==0) ) ||
 			((! MatchAP) && (strcasecmp(Found->ESSID, Net->ESSID)==0) )
 		 )
 	{
@@ -108,6 +109,7 @@ Configs=SettingsLoadNets(Conf->ESSID);
 Networks=ListCreate();
 
 NetSetupInterface(Dev, "", "", "", "");
+usleep(100000);
 for (i=0; i < 4; i++)
 {
 WifiScanNetworks(Dev, Networks);
@@ -128,7 +130,10 @@ if (Net)
   if (! StrValid(Conf->Gateway)) Conf->Gateway=CopyStr(Conf->Gateway, Net->Gateway);
 }
 
-if (Conf->Flags & (NET_RSN | NET_WPA1 | NET_WPA2)) WPASupplicantActivate(Dev, Conf);
+if (Conf->Flags & (NET_RSN | NET_WPA1 | NET_WPA2)) 
+{
+	if (! (Conf->Flags & NET_JOINING)) WPASupplicantActivate(Dev, Conf);
+}
 else 
 {
 	if (! WirelessToolsSetupInterface(Dev, Conf))
@@ -136,6 +141,8 @@ else
 		IWSetupInterface(Dev, Conf);
 	}
 }
+
+Conf->Flags |= NET_JOINING;
 
 ListDestroy(Networks, NetDestroy);
 ListDestroy(Configs, NetDestroy);

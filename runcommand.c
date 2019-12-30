@@ -65,11 +65,15 @@ if (! StrValid(p_ExecPath))
 if (Flags & RUNCMD_ROOT) 
 {
 	p_Path=GetVar(Commands, "su");
-	if (p_Path) Tempstr=MCopyStr(Tempstr, "cmd:", p_Path, "  -c '", p_ExecPath, " ", p_args, "'", NULL);
+	if (p_Path) Exec=MCopyStr(Exec, "cmd:", p_Path, "  -c '", p_ExecPath, " ", p_args, "'", NULL);
 }
-else Tempstr=MCopyStr(Tempstr, "cmd:", p_ExecPath, " ", p_args, NULL);
+else Exec=MCopyStr(Exec, "cmd:", p_ExecPath, " ", p_args, NULL);
 
-S=STREAMOpen(Tempstr, "pty");
+Tempstr=CopyStr(Tempstr, "pty");
+if (Flags & RUNCMD_DAEMON) Tempstr=CatStr(Tempstr, " daemon");
+if (Flags & RUNCMD_NOSHELL) Tempstr=CatStr(Tempstr, " noshell");
+
+S=STREAMOpen(Exec, Tempstr);
 if (S)
 {
 if (Flags & RUNCMD_ROOT) 
@@ -88,9 +92,9 @@ STREAMClose(S);
 }
 else
 {
-//we couldn't launch the command. Indicate this by returning null
-Destroy(RetStr);
-RetStr=NULL;
+	//we couldn't launch the command. Indicate this by returning null
+	Destroy(RetStr);
+	RetStr=NULL;
 }
 
 Destroy(Tempstr);
