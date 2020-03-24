@@ -107,14 +107,23 @@ if (S)
 		if (Net->Flags & NET_WPA2) STREAMWriteLine("wpa2\n", S);
 		if (Net->Flags & NET_WPA1) STREAMWriteLine("wpa1\n", S);
 
+		if (StrValid(Net->UserID))
+		{
 		Tempstr=MCopyStr(Tempstr, "user ", Net->UserID, "\n", NULL);
 		STREAMWriteLine(Tempstr, S);
+		}
 	
+		if (StrValid(Net->Key))
+		{
 		Tempstr=MCopyStr(Tempstr, "key ", Net->Key, "\n", NULL);
 		STREAMWriteLine(Tempstr, S);
+		}
 
+		if (StrValid(Net->Address))
+		{
 		Tempstr=MCopyStr(Tempstr, "address ", Net->Address, "\n", NULL);
 		STREAMWriteLine(Tempstr, S);
+		}
 
 		if (StrValid(Net->Netmask))
 		{
