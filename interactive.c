@@ -87,44 +87,91 @@ NetDestroy(Net);
 }
 
 
-void InteractiveQueryNetConfig(TNetDev *Dev, TNet *Net)
+int InteractiveQueryNetConfig(TNetDev *Dev, TNet *Net)
 {
 char *Tempstr=NULL;
 
 TerminalClear(StdIO);
 TerminalCursorMove(StdIO, 0, 0);
-TerminalPutStr("~M~w Please enter config for wireless network~>~0", StdIO);
+TerminalPutStr("~M~w Please enter config for wireless network~>~0\n", StdIO);
+TerminalPutStr("~e Double-escape to cancel and return to network select~0\n\n", StdIO);
 
 TerminalCursorMove(StdIO, 0, 2);
 
 if (Net->Flags & NET_ENCRYPTED)
 {
+
 Net->UserID=TerminalReadPrompt(Net->UserID, "Username (blank for none): ", 0, StdIO);
+if (Net->UserID==NULL)
+{
+TerminalClear(StdIO);
+Destroy(Tempstr);
+return(FALSE);
+}
+
 StripCRLF(Net->UserID);
 TerminalPutStr("\n", StdIO);
 
 
 Net->Key=TerminalReadPrompt(Net->Key, "Key/password: ", 0, StdIO);
-StripCRLF(Net->Key);
+if (Net->Key==NULL)
+{
+TerminalClear(StdIO);
+Destroy(Tempstr);
+return(FALSE);
+}
 
+
+StripCRLF(Net->Key);
 TerminalPutStr("\n", StdIO);
 }
 
+
+
 Net->Address=TerminalReadPrompt(Net->Address, "Address (blank for DHCP): ", 0, StdIO);
+if (Net->Address==NULL)
+{
+TerminalClear(StdIO);
+Destroy(Tempstr);
+return(FALSE);
+}
+
 StripCRLF(Net->Address);
+TerminalPutStr("\n", StdIO);
 
 if (StrValid(Net->Address)) 
 {
-	TerminalPutStr("\n", StdIO);
+
 	Net->Netmask=TerminalReadPrompt(Net->Netmask, "Netmask: ", 0, StdIO);
+	if (Net->Netmask==NULL)
+	{
+	TerminalClear(StdIO);
+	Destroy(Tempstr);
+	return(FALSE);
+	}
+	
 	StripCRLF(Net->Netmask);
-
 	TerminalPutStr("\n", StdIO);
+
 	Net->Gateway=TerminalReadPrompt(Net->Gateway, "Gateway: ", 0, StdIO);
-	StripCRLF(Net->Gateway);
+	if (Net->Gateway==NULL)
+	{
+	TerminalClear(StdIO);
+	Destroy(Tempstr);
+	return(FALSE);
+	}
 
+	StripCRLF(Net->Gateway);
 	TerminalPutStr("\n", StdIO);
+
 	Net->DNSServer=TerminalReadPrompt(Net->DNSServer, "DNS Server: ", 0, StdIO);
+	if (Net->DNSServer==NULL)
+	{
+	TerminalClear(StdIO);
+	Destroy(Tempstr);
+	return(FALSE);
+	}
+
 	StripCRLF(Net->DNSServer);
 }
 else Net->Address=CopyStr(Net->Address, "dhcp");
@@ -133,6 +180,12 @@ else Net->Address=CopyStr(Net->Address, "dhcp");
 TerminalPutStr("\n", StdIO);
 TerminalPutStr("\n", StdIO);
 Tempstr=TerminalReadPrompt(Tempstr, "Save for future use? Y/n:  ", 0, StdIO);
+if (Tempstr==NULL)
+{
+	TerminalClear(StdIO);
+	return(FALSE);
+}
+
 StripLeadingWhitespace(Tempstr);
 StripTrailingWhitespace(Tempstr);
 
@@ -141,12 +194,20 @@ if (StrValid(Tempstr) && (tolower(Tempstr[0])=='y') ) SettingsSaveNet(Net);
 
 TerminalClear(StdIO);
 Destroy(Tempstr);
+
+return(TRUE);
 }
+
 
 
 void InteractiveJoinNetwork(TNetDev *Dev, TNet *Conf, STREAM *Out)
 {
 TNet *Net;
+
+	if (! StrValid(Conf->Address)) 
+	{
+		if (! InteractiveQueryNetConfig(Dev, Conf)) return;
+	}
 
 	Net=(TNet *) calloc(1, sizeof(TNet));
 
@@ -238,14 +299,11 @@ while (1)
 		Net=(TNet *) Curr->Item;
 
 		SettingsConfigureNet(Net);
-		if (! StrValid(Net->Address)) 
-		{
-			InteractiveQueryNetConfig(Dev, Net);
-			InteractiveWifiMenuUpdate(Menu);
-			TerminalMenuDraw(Menu);
-		}
 
 		InteractiveJoinNetwork(Dev, Net, StdIO);
+		InteractiveWifiMenuUpdate(Menu);
+		TerminalMenuDraw(Menu);
+
 	}
 	}
 }
