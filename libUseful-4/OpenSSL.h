@@ -94,6 +94,7 @@ int DoSSLClientNegotiation(STREAM *S, int Flags);
 //'Flags' can be any of the LU_SSL_ flags listed above
 int DoSSLServerNegotiation(STREAM *S, int Flags);
 
+//This is called automatically by STREAMClose. You won't generally explicitly call this.
 void OpenSSLClose(STREAM *S);
 
 //call this before doing anything else with a STREAM that's been 'accept'-ed from a server socket. If the stream is encrypted

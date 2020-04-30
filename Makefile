@@ -1,4 +1,4 @@
-VERSION=1.2
+VERSION=1.1
 CC=gcc
 LIBS=  libUseful-4/libUseful.a
 FLAGS=-g -O2 -DVERSION=\"$(VERSION)\"
