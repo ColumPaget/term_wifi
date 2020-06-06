@@ -101,6 +101,18 @@ TerminalCursorMove(StdIO, 0, 2);
 if (Net->Flags & NET_ENCRYPTED)
 {
 
+Net->CountryCode=TerminalReadPrompt(Net->CountryCode, "2-letter country code: ", 0, StdIO);
+if (Net->CountryCode==NULL)
+{
+TerminalClear(StdIO);
+Destroy(Tempstr);
+return(FALSE);
+}
+
+StripCRLF(Net->CountryCode);
+TerminalPutStr("\n", StdIO);
+
+
 Net->UserID=TerminalReadPrompt(Net->UserID, "Username (blank for none): ", 0, StdIO);
 if (Net->UserID==NULL)
 {

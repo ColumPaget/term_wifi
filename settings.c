@@ -66,6 +66,7 @@ if (S)
 		if (strcmp(Token, "address")==0) Net->Address=CopyStr(Net->Address, ptr);
 		if (strcmp(Token, "netmask")==0) Net->Netmask=CopyStr(Net->Netmask, ptr);
 		if (strcmp(Token, "gateway")==0) Net->Gateway=CopyStr(Net->Gateway, ptr);
+		if (strcmp(Token, "country")==0) Net->CountryCode=CopyStr(Net->CountryCode, ptr);
 		if (strcmp(Token, "dns")==0) Net->DNSServer=CopyStr(Net->DNSServer, ptr);
 		if (strcmp(Token, "accesspoint")==0) Net->AccessPoint=CopyStr(Net->AccessPoint, ptr);
 		if (strcmp(Token, "channel")==0) Net->Channel=atoi(ptr);
@@ -107,6 +108,12 @@ if (S)
 		if (Net->Flags & NET_WPA2) STREAMWriteLine("wpa2\n", S);
 		if (Net->Flags & NET_WPA1) STREAMWriteLine("wpa1\n", S);
 
+		if (StrValid(Net->CountryCode))
+		{
+		Tempstr=MCopyStr(Tempstr, "country ", Net->CountryCode, "\n", NULL);
+		STREAMWriteLine(Tempstr, S);
+		}
+	
 		if (StrValid(Net->UserID))
 		{
 		Tempstr=MCopyStr(Tempstr, "user ", Net->UserID, "\n", NULL);

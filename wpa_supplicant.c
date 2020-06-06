@@ -12,6 +12,12 @@ STREAM *S;
 S=STREAMOpen(Path, "w");
 if (S)
 {
+	if (StrValid(Net->CountryCode))
+	{
+		Tempstr=MCopyStr(Tempstr, "country=", Net->CountryCode, "\n", NULL);
+		STREAMWriteLine(Tempstr, S);
+	}
+
  if (StrLen(Net->UserID)) Tempstr=FormatStr(Tempstr,"network={\nssid=\"%s\"\nkey_mgmt=WPA-EAP\neap=TTLS\nphase2=\"auth=PAP\"\nidentity=\"%s\"\npassword=\"%s\"\n}\n", Net->ESSID, Net->UserID, Net->Key);
  else Tempstr=FormatStr(Tempstr,"network={\nssid=\"%s\"\nscan_ssid=1\nkey_mgmt=WPA-PSK\npsk=\"%s\"\n}\n", Net->ESSID, Net->Key);
  STREAMWriteLine(Tempstr,S);

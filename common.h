@@ -36,6 +36,7 @@ char *Gateway;
 char *DNSServer;
 char *ESSID;
 char *AccessPoint;
+char *CountryCode;
 int Flags;
 int Channel;
 char *BitRates;
