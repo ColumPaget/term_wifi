@@ -82,16 +82,18 @@ else if (strcmp(ptr, "forget")==0)
 	Conf->ESSID=CopyStr(Conf->ESSID, CommandLineNext(CL));
 }
 else if (strcmp(ptr, "help")==0) Act=ACT_HELP;
-else if (strcmp(ptr, "-?")==0) Act=ACT_HELP;
-else if (strcmp(ptr, "-h")==0) Act=ACT_HELP;
-else if (strcmp(ptr, "-help")==0) Act=ACT_HELP;
-else if (strcmp(ptr, "--help")==0) Act=ACT_HELP;
-	
+}
 
-ptr=CommandLineNext(CL);
+
+
+ptr=CommandLineCurr(CL);
 while (ptr)
 {
-	if (strcmp(ptr, "-i")==0) Conf->Interface=CopyStr(Conf->Interface, CommandLineNext(CL));
+	if (strcmp(ptr, "-?")==0) Act=ACT_HELP;
+	else if (strcmp(ptr, "-h")==0) Act=ACT_HELP;
+	else if (strcmp(ptr, "-help")==0) Act=ACT_HELP;
+	else if (strcmp(ptr, "--help")==0) Act=ACT_HELP;
+	else if (strcmp(ptr, "-i")==0) Conf->Interface=CopyStr(Conf->Interface, CommandLineNext(CL));
 	else if (strcmp(ptr, "-ap")==0) Conf->AccessPoint=CopyStr(Conf->AccessPoint, CommandLineNext(CL));
 	else if (strcmp(ptr, "-k")==0) Conf->Key=CopyStr(Conf->Key, CommandLineNext(CL));
 	else if (strcmp(ptr, "-?")==0) Act=ACT_HELP;
@@ -100,7 +102,6 @@ while (ptr)
 	else if (strcmp(ptr, "--help")==0) Act=ACT_HELP;
 	
 	ptr=CommandLineNext(CL);
-}
 }
 
 return(Act);
@@ -117,9 +118,9 @@ Networks=SettingsLoadNets(NULL);
 Curr=ListGetNext(Networks);
 while (Curr)
 {
-Net=(TNet *) Curr->Item;
-printf("% 15s ip:%s netmask:%s gateway:%s dns:%s\n", Net->ESSID, Net->Address, Net->Netmask, Net->Gateway, Net->DNSServer);
-Curr=ListGetNext(Curr);
+	Net=(TNet *) Curr->Item;
+	printf("% 15s ip:%s netmask:%s gateway:%s dns:%s\n", Net->ESSID, Net->Address, Net->Netmask, Net->Gateway, Net->DNSServer);
+	Curr=ListGetNext(Curr);
 }
 
 }
@@ -165,9 +166,36 @@ printf("  term_wifi leave <interface>                                         le
 }
 
 
+
+TNetDev *SelectInterface(ListNode *Interfaces, const char *Interface)
+{
+ListNode *Curr;
+TNetDev *Dev;
+
+if (StrValid(Interface)) Curr=ListFindNamedItem(Interfaces, Interface);
+else 
+{
+	Curr=ListFindNamedItem(Interfaces, "wlan0");
+	if (! Curr)
+	{
+	Curr=ListGetNext(Interfaces);
+	while (Curr)
+	{
+	Dev=(TNetDev *) Curr->Item;
+	if (Dev->Flags & DEV_WIFI) break;
+	Curr=ListGetNext(Curr);
+	}
+	}
+}
+
+if (Curr) return((TNetDev *) Curr->Item);
+
+return(NULL);
+}
+
 int main(int argc, char *argv[])
 {
-ListNode *Networks, *Curr;
+ListNode *Networks;
 char *Tempstr=NULL;
 TNet *Conf, *Net;
 int Action;
@@ -183,12 +211,9 @@ NetGetInterfaces(Interfaces);
 Conf=NetCreate();
 Action=ParseCommandLine(argc, argv, Conf);
 
-if (StrValid(Conf->Interface)) Curr=ListFindNamedItem(Interfaces, Conf->Interface);
-else Curr=ListFindNamedItem(Interfaces, "wlan0");
-
-if (Curr)
+Dev=SelectInterface(Interfaces, Conf->Interface);
+if (Dev)
 {
-	Dev=(TNetDev *) Curr->Item;
 	switch (Action)
 	{
 	case ACT_ADD:
