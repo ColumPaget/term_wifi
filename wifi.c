@@ -125,6 +125,7 @@ if (Net)
 	Conf->Flags |= Net->Flags;
 	//update config with these items if they are not set, so if we then save the 
   if (! StrValid(Conf->Key)) Conf->Key=CopyStr(Conf->Key, Net->Key);
+  if (! StrValid(Conf->CountryCode)) Conf->CountryCode=CopyStr(Conf->CountryCode, Net->CountryCode);
   if (! StrValid(Conf->Address)) Conf->Address=CopyStr(Conf->Address, Net->Address);
   if (! StrValid(Conf->Netmask)) Conf->Netmask=CopyStr(Conf->Netmask, Net->Netmask);
   if (! StrValid(Conf->Gateway)) Conf->Gateway=CopyStr(Conf->Gateway, Net->Gateway);

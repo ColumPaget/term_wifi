@@ -1,11 +1,11 @@
 VERSION=1.4
 CC=gcc
-LIBS= -lUseful -lz -lcrypto -lssl  
+LIBS=  libUseful-4/libUseful.a
 FLAGS=-g -O2 -DVERSION=\"$(VERSION)\"
 
 OBJ=common.o net.o runcommand.o iw.o wireless_tools.o wpa_supplicant.o wifi.o interactive.o settings.o 
 
-all: $(OBJ) 
+all: $(OBJ) libUseful-4/libUseful.a
 	$(CC) $(FLAGS)  -oterm_wifi $(OBJ) main.c $(LIBS)
 
 libUseful-4/libUseful.a:

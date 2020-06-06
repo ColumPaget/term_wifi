@@ -76,6 +76,7 @@ Net->ESSID=CopyStr(Net->ESSID, "");
 Net->Address=CopyStr(Net->Address, "");
 Net->Netmask=CopyStr(Net->Netmask, "");
 Net->Key=CopyStr(Net->Key, "");
+Net->CountryCode=CopyStr(Net->CountryCode, "");
 Net->AccessPoint=CopyStr(Net->AccessPoint, "");
 
 return(Net);
@@ -96,6 +97,7 @@ Destroy(Net->Address);
 Destroy(Net->Netmask);
 Destroy(Net->Gateway);
 Destroy(Net->BitRates);
+Destroy(Net->CountryCode);
 Destroy(Net->UserID);
 Destroy(Net->Key);
 free(Net);

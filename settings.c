@@ -222,6 +222,7 @@ tmpNet->Netmask=CopyStr(tmpNet->Netmask, Net->Netmask);
 tmpNet->Gateway=CopyStr(tmpNet->Gateway, Net->Gateway);
 tmpNet->DNSServer=CopyStr(tmpNet->DNSServer, Net->DNSServer);
 tmpNet->AccessPoint=CopyStr(tmpNet->AccessPoint, Net->AccessPoint);
+tmpNet->CountryCode=CopyStr(tmpNet->CountryCode, Net->CountryCode);
 ListAddNamedItem(Nets, tmpNet->ESSID, tmpNet);
 
 SettingsSaveNets(Nets);
