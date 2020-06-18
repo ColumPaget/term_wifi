@@ -291,7 +291,12 @@ while (1)
   TerminalPutStr("~B~w      s:Scan again   d:disconnect   escape-escape:exit~>~0", StdIO);
 
 	ch=TerminalReadChar(StdIO);
-	if (ch==ESCAPE) break;
+	if (ch==STREAM_CLOSED) 
+	{
+		//stdin/terminal closed, exit gracefully
+		exit(0);
+	}
+	else if (ch==ESCAPE) break;
 	else if (ch=='s') InteractiveWifiScan(Dev, Menu);
 	else if (ch=='d') NetDown(Dev);
 	else if (ch=='f') 

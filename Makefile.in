@@ -1,4 +1,4 @@
-VERSION=1.4
+VERSION=1.5
 CC=@CC@
 LIBS=@LDFLAGS@ @LIBS@ @STATIC_LIBS@
 FLAGS=@CFLAGS@ -DVERSION=\"$(VERSION)\"
@@ -40,7 +40,7 @@ settings.o: settings.h settings.c common.h
 
 
 clean:
-	rm *.o libUseful-4/*.o libUseful-4/*.a libUseful-4/*.so
+	rm term_wifi *.o libUseful-4/*.o libUseful-4/*.a libUseful-4/*.so
 
 test:
 	echo "no tests"
