@@ -38,12 +38,24 @@ Once a setup is added to known networks you can join to it with:
 	term_wifi join <interface> <essid>
 ```
 
+'connect' does the same thing as 'join' but uses the default interface:
+
+```
+	term_wifi connect <essid>
+```
+
 If a wifi password is not known at this stage, you will be prompted for one. If the current user is not root you will likely be prompted for the system root password too.
 
 To leave a wifi network that you're currently connected to use:
 
 ```
 	term_wifi leave <interface>
+```
+
+To view available wifi interfaces:
+
+```
+	term_wifi interfaces
 ```
 
 To view currently configured wifi networks:
@@ -61,4 +73,14 @@ To 'forget' (delete) a configured network
 
 # INTERACTIVE (USER INTERFACE) MODE
 
-if term_wifi is run without any arguments the user will be presented with a simple terminal user interface.
+if term_wifi is run without any arguments the user will be presented with a simple terminal user interface. You can use the '-i' option to show the tui for a given wifi device like so:
+
+```
+	term_wifi -i wlan1
+```
+
+
+# OPTIONS
+
+you can use `-i <interface>` to specify and interface to use for the 'connect', 'scan' and tui commands.
+

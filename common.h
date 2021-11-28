@@ -23,6 +23,7 @@ typedef struct
 {
 char *Name;
 int Flags;
+char *Driver;
 } TNetDev;
 
 

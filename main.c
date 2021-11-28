@@ -11,6 +11,7 @@
 #define ACT_LIST   4
 #define ACT_SCAN   5
 #define ACT_FORGET 6
+#define ACT_IFACE_LIST 7
 #define ACT_HELP   99
 
 ListNode *Interfaces=NULL;
@@ -28,14 +29,13 @@ ptr=CommandLineFirst(CL);
 if (StrValid(ptr))
 {
 if (strcmp(ptr, "list")==0) Act=ACT_LIST;
+else if (strcmp(ptr, "interfaces")==0) Act=ACT_IFACE_LIST;
 else if (strcmp(ptr, "scan")==0) 
 {
-	Conf->Interface=CopyStr(Conf->Interface, CommandLineNext(CL));
-	if (! ListFindNamedItem(Interfaces, Conf->Interface))
+	ptr=CommandLineNext(CL);
+	if (ListFindNamedItem(Interfaces, ptr))
 	{
-			printf("ERROR: '%s' is not an interface\n", Conf->Interface);
-			printf("usage: %s scan <interface>\n", argv[0]);
-			exit(1);
+		Conf->Interface=CopyStr(Conf->Interface, ptr);
 	}
 	Act=ACT_SCAN;
 }
@@ -64,6 +64,12 @@ else if (strcmp(ptr, "join")==0)
 	}
 
 	Conf->ESSID=CopyStr(Conf->ESSID, CommandLineNext(CL));
+}
+else if (strcmp(ptr, "connect")==0) 
+{
+	Act=ACT_JOIN;
+	Conf->ESSID=CopyStr(Conf->ESSID, CommandLineNext(CL));
+	Conf->Interface=CopyStr(Conf->Interface, CommandLineNext(CL));
 }
 else if (strcmp(ptr, "leave")==0) 
 {
@@ -96,15 +102,28 @@ while (ptr)
 	else if (strcmp(ptr, "-i")==0) Conf->Interface=CopyStr(Conf->Interface, CommandLineNext(CL));
 	else if (strcmp(ptr, "-ap")==0) Conf->AccessPoint=CopyStr(Conf->AccessPoint, CommandLineNext(CL));
 	else if (strcmp(ptr, "-k")==0) Conf->Key=CopyStr(Conf->Key, CommandLineNext(CL));
-	else if (strcmp(ptr, "-?")==0) Act=ACT_HELP;
-	else if (strcmp(ptr, "-h")==0) Act=ACT_HELP;
-	else if (strcmp(ptr, "-help")==0) Act=ACT_HELP;
-	else if (strcmp(ptr, "--help")==0) Act=ACT_HELP;
 	
 	ptr=CommandLineNext(CL);
 }
 
 return(Act);
+}
+
+
+void ListInterfaces()
+{
+ListNode *Curr, *Networks;
+TNetDev *Iface;
+
+printf("Interfaces: \n");
+Curr=ListGetNext(Interfaces);
+while (Curr)
+{
+	Iface=(TNetDev *) Curr->Item;
+	if (Iface->Flags & DEV_WIFI) printf("% 15s %s\n", Iface->Name, Iface->Driver);
+	Curr=ListGetNext(Curr);
+}
+
 }
 
 
@@ -156,6 +175,7 @@ void DisplayHelp()
 {
 printf("version: %s\n", VERSION);
 printf("usage:\n");
+printf("  term_wifi interfaces                                                list interfaces\n");
 printf("  term_wifi scan <interface>                                          scan networks and output details\n");
 printf("  term_wifi add <essid> <address> <netmask> <gateway>  <dns server>   add a config for a network\n");
 printf("  term_wifi add <essid> dhcp                                          add a config for a network using dhcp\n");
@@ -163,6 +183,15 @@ printf("  term_wifi forget <essid>                                            de
 printf("  term_wifi list                                                      list configured networks\n");
 printf("  term_wifi join <interface> <essid>                                  join a configured network\n");
 printf("  term_wifi leave <interface>                                         leave current network\n");
+printf("  term_wifi connect <essid>                                           join configured network with default interface\n");
+printf("  term_wifi -?                                                        this help\n");
+printf("  term_wifi -h                                                        this help\n");
+printf("  term_wifi -help                                                     this help\n");
+printf("  term_wifi --help                                                    this help\n");
+printf("options that apply to connect/interactive mode\n");
+printf("  -i <interface>                                                      interface to use\n");
+printf("  -ap <access point mac address>                                      access point to join (if many for same essid)\n");
+printf("  -k <key>                                                            authentication key for given essid/network)\n");
 }
 
 
@@ -266,6 +295,10 @@ if (Dev)
 
 	case ACT_HELP:
 		DisplayHelp();
+	break;
+
+	case ACT_IFACE_LIST:
+		ListInterfaces();
 	break;
 	}
 }

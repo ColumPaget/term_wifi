@@ -19,9 +19,10 @@ void NetGetInterfaces(ListNode *Interfaces)
 {
 glob_t Glob;
 TNetDev *Dev;
-char *Tempstr=NULL;
-const char *iname;
+char *Tempstr=NULL, *Token=NULL;
+const char *iname, *ptr;
 int i, Flags=0;
+STREAM *S;
 
 glob(SYSFS_NETS_GLOB, 0, 0, &Glob);
 for (i=0; i < Glob.gl_pathc; i++)
@@ -29,10 +30,26 @@ for (i=0; i < Glob.gl_pathc; i++)
 	iname=GetBasename(Glob.gl_pathv[i]);
 	if (StrValid(iname))
 	{
-	  Tempstr=MCopyStr(Tempstr, Glob.gl_pathv[i], "/wireless",NULL);
+	  Tempstr=MCopyStr(Tempstr, Glob.gl_pathv[i], "/wireless", NULL);
 		if (access(Tempstr, F_OK)==0) Flags |= DEV_WIFI;
 	
 		Dev=NetDevCreate(iname, Flags);
+
+	  Tempstr=MCopyStr(Tempstr, Glob.gl_pathv[i], "/device/uevent", NULL);
+		S=STREAMOpen(Tempstr, "r");
+		if (S)
+		{
+		Tempstr=STREAMReadLine(Tempstr, S);
+		while (Tempstr)
+		{
+		StripTrailingWhitespace(Tempstr);
+		ptr=GetToken(Tempstr, "=", &Token, 0);
+		if (strcmp(Token, "DRIVER")==0) Dev->Driver=CopyStr(Dev->Driver, ptr);
+		Tempstr=STREAMReadLine(Tempstr, S);
+		}
+		STREAMClose(S);
+		}
+		
 		ListAddNamedItem(Interfaces, iname, Dev);	
 	}
 }
