@@ -87,6 +87,8 @@ SSL:VerifyCertFile    set path to file containing a concatanated list of C.A. ce
 
 Net:Timeout           set default timeout for all network connections
 TCP:keep_alives       use tcp keepalives for all network connections
+
+Unicode:NamesFile     path to file that maps names->unicode code points
 */
 
 
@@ -114,6 +116,10 @@ const char *LibUsefulGetValue(const char *Name);
 int LibUsefulGetBool(const char *Name);
 
 int LibUsefulGetInteger(const char *Name);
+
+
+//returns TRUE if libUseful Debug is active, FALSE otehrwise
+int LibUsefulDebugActive();
 
 //this function gets called at exit to do certain cleaning up. It's no concern of the user.
 //nothing to see here, move along

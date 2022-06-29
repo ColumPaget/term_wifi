@@ -3,7 +3,7 @@ CC=gcc
 LIBS=  libUseful-4/libUseful.a
 FLAGS=-g -O2 -DVERSION=\"$(VERSION)\"
 
-OBJ=common.o net.o runcommand.o iw.o wireless_tools.o wpa_supplicant.o wifi.o interactive.o settings.o 
+OBJ=common.o net.o netdev.o runcommand.o iw.o wireless_tools.o wpa_supplicant.o wifi.o interactive.o settings.o help.o
 
 all: $(OBJ) libUseful-4/libUseful.a
 	$(CC) $(FLAGS)  -oterm_wifi $(OBJ) main.c $(LIBS)
@@ -19,6 +19,12 @@ interactive.o: interactive.h interactive.c common.h
 
 net.o: net.h net.c common.h
 	$(CC) $(FLAGS)  -c net.c
+
+help.o: help.h help.c common.h
+	$(CC) $(FLAGS)  -c help.c
+
+netdev.o: netdev.h netdev.c common.h
+	$(CC) $(FLAGS)  -c netdev.c
 
 wifi.o: wifi.h wifi.c common.h
 	$(CC) $(FLAGS)  -c wifi.c

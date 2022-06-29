@@ -49,6 +49,7 @@ float dBm;
 
 
 extern ListNode *ConfiguredNets;
+extern ListNode *Interfaces;
 extern STREAM *StdIO;
 
 typedef void (*INTERACTIVE_STATUS_CALLBACK)(TNetDev *Dev, const char *Text);
@@ -61,6 +62,7 @@ void NetDestroy(void *p_Net);
 const char *OutputNetQualityColor(TNet *Net);
 char *OutputFormatNet(char *Output, TNet *Net);
 
+int FrequencyToChannel(int freq);
 void QueryRootPassword(const char *Prompt);
 
 #endif

@@ -10,14 +10,16 @@
 #define FLAG_DAEMON 1
 #define FLAG_INTERACTIVE 2
 
-struct
+typedef struct
 {
 int Flags;
 char *PidsDir;
 char *ConfigFile;
 char *RootPassword;
-} Settings;
+char *WPASupplicantSock;
+} TSettings;
 
+extern TSettings Settings;
 
 void SettingsInit();
 void SettingsPostProcess();

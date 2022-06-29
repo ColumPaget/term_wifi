@@ -4,6 +4,8 @@
 #include "net.h"
 #include "common.h"
 
+
+int WPASupplicantGetNetworks(TNetDev *Dev, ListNode *Networks);
 int WPASupplicantActivate(TNetDev *Dev, TNet *Net);
 
 #endif
