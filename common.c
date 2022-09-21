@@ -153,7 +153,7 @@ char *OutputFormatNet(char *Output, TNet *Net)
         ptr=GetToken(ptr, "\\S", &Tempstr, 0);
     }
 
-    Tempstr=FormatStr(Tempstr, "  %0.1fMb/s   chan:%02d  %s  ", Rate, Net->Channel, Net->AccessPoint);
+    Tempstr=FormatStr(Tempstr, "  %0.1fMb/s   chan:%03d  %s  ", Rate, Net->Channel, Net->AccessPoint);
     Output=CatStr(Output, Tempstr);
 
     Output=MCatStr(Output, "~e", Net->ESSID, "~0 ", NULL);

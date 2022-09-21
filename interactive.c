@@ -17,7 +17,7 @@ static void InteractiveHeaders(TNetDev *Dev, TNet *Net, STREAM *Out)
     Line=MCopyStr(Line, "    Iface:  ~e", Dev->Name, "~0  ", Net->MacAddress, "\n", NULL);
     if (Net->Flags & NET_ASSOCIATED)
     {
-        Tempstr=FormatStr(Tempstr, "    Wifi:   ~gASSOCIATED~0  ~e%s~0  AP:%s  chan:%02d  qual:%s%0.1f%%~0\n", Net->ESSID, Net->AccessPoint, Net->Channel, OutputNetQualityColor(Net), Net->Quality * 100.0);
+        Tempstr=FormatStr(Tempstr, "    Wifi:   ~gASSOCIATED~0  ~e%s~0  AP:%s  chan:%03d  qual:%s%0.1f%%~0\n", Net->ESSID, Net->AccessPoint, Net->Channel, OutputNetQualityColor(Net), Net->Quality * 100.0);
         Line=CatStr(Line, Tempstr);
     }
     else Line=MCatStr(Line, "    Wifi:    ~rnot associated~0~>\n", NULL);
