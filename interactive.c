@@ -4,6 +4,12 @@
 #include "netdev.h"
 #include "settings.h"
 
+#define DISPLAY_ALL_NETS 0
+#define DISPLAY_KNOWN_NETS 1
+#define DISPLAY_OPEN_NETS  2
+
+ListNode *InteractiveNetList=NULL;
+int InteractiveDisplayMode=0;
 
 
 static void InteractiveHeaders(TNetDev *Dev, TNet *Net, STREAM *Out)
@@ -36,16 +42,12 @@ static void InteractiveWifiMenuUpdate(TERMMENU *Menu)
 {
     ListNode *Curr;
 
-    ConfiguredNets=SettingsLoadNets(NULL);
     Curr=ListGetNext(Menu->Options);
     while (Curr)
     {
         Curr->Tag=OutputFormatNet(Curr->Tag, (TNet *) Curr->Item);
         Curr=ListGetNext(Curr);
     }
-
-    ListDestroy(ConfiguredNets, NetDestroy);
-    ConfiguredNets=NULL;
 }
 
 
@@ -70,30 +72,46 @@ static void InteractiveTitleBar(TNetDev *Dev, const char *Str)
 static void InteractiveBottomBar(STREAM *StdIO, int wid, int len)
 {
         TerminalCursorMove(StdIO, 0, len-2);
-        TerminalPutStr("~B~wKeys: up/down-arrow:select network  Enter:join network  f:forget network~>~0", StdIO);
+        TerminalPutStr("~B~wKeys: up/down-arrow:select network  Enter:join network  f:forget network  k:known nets  o:open nets~>~0", StdIO);
         TerminalCursorMove(StdIO, 0, len-1);
         TerminalPutStr("~B~w      s:Scan again   d:disconnect   escape-escape:exit  i:change interface~>~0", StdIO);
 }
 
 
-static void InteractiveWifiScan(TNetDev *Dev, TERMMENU *Menu)
+static void InteractiveWifiNetworksReload(TERMMENU *Menu, ListNode *Networks)
 {
-    ListNode *Networks, *Curr;
-    char *Tempstr=NULL;
+    ListNode *Curr;
+		TNet *Net;
 
-    Networks=WifiGetNetworks(Dev);
+		if (ConfiguredNets) ListDestroy(ConfiguredNets, NetDestroy);
+    ConfiguredNets=SettingsLoadNets(NULL);
+
     ListClear(Menu->Options, NULL);
     Curr=ListGetNext(Networks);
     while (Curr)
     {
-        ListAddItem(Menu->Options, Curr->Item);
+				Net=(TNet *) Curr->Item;
+				if (InteractiveDisplayMode == DISPLAY_KNOWN_NETS) 
+				{
+    			if (ListFindNamedItem(ConfiguredNets, Net->ESSID)) ListAddItem(Menu->Options, Net);
+				}
+				else if (InteractiveDisplayMode == DISPLAY_OPEN_NETS) 
+				{
+    			if (! (Net->Flags & NET_ENCRYPTED)) ListAddItem(Menu->Options, Net);
+				}
+        else ListAddItem(Menu->Options, Net);
         Curr=ListGetNext(Curr);
     }
 
     InteractiveWifiMenuUpdate(Menu);
-    ListDestroy(Networks, NULL);
+}
 
-    Destroy(Tempstr);
+
+static void InteractiveWifiScan(TNetDev *Dev, TERMMENU *Menu)
+{
+		if (! InteractiveNetList) InteractiveNetList=ListCreate();
+    InteractiveNetList=WifiGetNetworks(Dev);
+		InteractiveWifiNetworksReload(Menu, InteractiveNetList);
 }
 
 void InteractiveWifiUpdate(TNetDev *Dev, STREAM *StdIO, TERMMENU *Menu, int wid, int len)
@@ -333,6 +351,9 @@ void Interactive(TNetDev *iDev)
     int NotExit=TRUE;
 
 		Dev=NetDevClone(iDev);
+		if (ConfiguredNets) ListDestroy(ConfiguredNets, NetDestroy);
+    ConfiguredNets=SettingsLoadNets(NULL);
+
     TerminalInit(StdIO, TERM_RAWKEYS | TERM_SAVEATTRIBS);
 
     TerminalClear(StdIO);
@@ -378,6 +399,18 @@ void Interactive(TNetDev *iDev)
             }
             break;
 
+				case 'o':
+						if (InteractiveDisplayMode != DISPLAY_OPEN_NETS) InteractiveDisplayMode=DISPLAY_OPEN_NETS;
+						else InteractiveDisplayMode=DISPLAY_ALL_NETS;
+						InteractiveWifiNetworksReload(Menu, InteractiveNetList);
+						break;
+			
+				case 'k':
+						if (InteractiveDisplayMode != DISPLAY_KNOWN_NETS) InteractiveDisplayMode=DISPLAY_KNOWN_NETS;
+						else InteractiveDisplayMode=DISPLAY_ALL_NETS;
+						InteractiveWifiNetworksReload(Menu, InteractiveNetList);
+						break;
+	
         default:
             Curr=TerminalMenuOnKey(Menu, ch);
             if (Curr)
