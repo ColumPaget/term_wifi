@@ -2,7 +2,13 @@
 #ifndef WMAN_COMMON_H
 #define WMAN_COMMON_H
 
+#ifdef HAVE_LIBUSEFUL5_LIBUSEFUL_H
+#include "libUseful-5/libUseful.h"
+#else
 #include "libUseful-4/libUseful.h"
+#endif
+
+
 #include <glob.h>
 
 #define NET_WPA1 1

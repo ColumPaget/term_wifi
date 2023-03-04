@@ -219,44 +219,84 @@ m4trace:configure.ac:7: -1- AH_OUTPUT([_DARWIN_USE_64_BIT_INODE], [/* Enable lar
 #ifndef _DARWIN_USE_64_BIT_INODE
 # define _DARWIN_USE_64_BIT_INODE 1
 #endif])
-m4trace:configure.ac:13: -1- AH_OUTPUT([HAVE_LIBSSL], [/* Define to 1 if you have the `ssl\' library (-lssl). */
+m4trace:configure.ac:17: -1- AH_OUTPUT([HAVE_LIBUSEFUL_5_LIBUSEFUL_H], [/* Define to 1 if you have the <libUseful-5/libUseful.h> header file. */
+@%:@undef HAVE_LIBUSEFUL_5_LIBUSEFUL_H])
+m4trace:configure.ac:17: -1- AH_OUTPUT([HAVE_SYS_TYPES_H], [/* Define to 1 if you have the <sys/types.h> header file. */
+@%:@undef HAVE_SYS_TYPES_H])
+m4trace:configure.ac:17: -1- AH_OUTPUT([HAVE_SYS_STAT_H], [/* Define to 1 if you have the <sys/stat.h> header file. */
+@%:@undef HAVE_SYS_STAT_H])
+m4trace:configure.ac:17: -1- AH_OUTPUT([HAVE_STDLIB_H], [/* Define to 1 if you have the <stdlib.h> header file. */
+@%:@undef HAVE_STDLIB_H])
+m4trace:configure.ac:17: -1- AH_OUTPUT([HAVE_STRING_H], [/* Define to 1 if you have the <string.h> header file. */
+@%:@undef HAVE_STRING_H])
+m4trace:configure.ac:17: -1- AH_OUTPUT([HAVE_MEMORY_H], [/* Define to 1 if you have the <memory.h> header file. */
+@%:@undef HAVE_MEMORY_H])
+m4trace:configure.ac:17: -1- AH_OUTPUT([HAVE_STRINGS_H], [/* Define to 1 if you have the <strings.h> header file. */
+@%:@undef HAVE_STRINGS_H])
+m4trace:configure.ac:17: -1- AH_OUTPUT([HAVE_INTTYPES_H], [/* Define to 1 if you have the <inttypes.h> header file. */
+@%:@undef HAVE_INTTYPES_H])
+m4trace:configure.ac:17: -1- AH_OUTPUT([HAVE_STDINT_H], [/* Define to 1 if you have the <stdint.h> header file. */
+@%:@undef HAVE_STDINT_H])
+m4trace:configure.ac:17: -1- AH_OUTPUT([HAVE_UNISTD_H], [/* Define to 1 if you have the <unistd.h> header file. */
+@%:@undef HAVE_UNISTD_H])
+m4trace:configure.ac:17: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBUSEFUL_5_LIBUSEFUL_H])
+m4trace:configure.ac:17: -1- m4_pattern_allow([^HAVE_LIBUSEFUL_5_LIBUSEFUL_H$])
+m4trace:configure.ac:20: -1- AH_OUTPUT([HAVE_LIBUSEFUL_4_LIBUSEFUL_H], [/* Define to 1 if you have the <libUseful-4/libUseful.h> header file. */
+@%:@undef HAVE_LIBUSEFUL_4_LIBUSEFUL_H])
+m4trace:configure.ac:20: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBUSEFUL_4_LIBUSEFUL_H])
+m4trace:configure.ac:20: -1- m4_pattern_allow([^HAVE_LIBUSEFUL_4_LIBUSEFUL_H$])
+m4trace:configure.ac:28: -1- AC_SUBST([LIBUSEFUL_BUNDLED], [""])
+m4trace:configure.ac:28: -1- AC_SUBST_TRACE([LIBUSEFUL_BUNDLED])
+m4trace:configure.ac:28: -1- m4_pattern_allow([^LIBUSEFUL_BUNDLED$])
+m4trace:configure.ac:31: -1- AH_OUTPUT([HAVE_LIBUSEFUL_5], [/* Define to 1 if you have the `Useful-5\' library (-lUseful-5). */
+@%:@undef HAVE_LIBUSEFUL_5])
+m4trace:configure.ac:31: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBUSEFUL_5])
+m4trace:configure.ac:31: -1- m4_pattern_allow([^HAVE_LIBUSEFUL_5$])
+m4trace:configure.ac:35: -1- AH_OUTPUT([HAVE_LIBSSL], [/* Define to 1 if you have the `ssl\' library (-lssl). */
 @%:@undef HAVE_LIBSSL])
-m4trace:configure.ac:13: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBSSL])
-m4trace:configure.ac:13: -1- m4_pattern_allow([^HAVE_LIBSSL$])
-m4trace:configure.ac:13: -1- AH_OUTPUT([HAVE_LIBCRYPTO], [/* Define to 1 if you have the `crypto\' library (-lcrypto). */
+m4trace:configure.ac:35: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBSSL])
+m4trace:configure.ac:35: -1- m4_pattern_allow([^HAVE_LIBSSL$])
+m4trace:configure.ac:36: -1- AH_OUTPUT([HAVE_LIBCRYPTO], [/* Define to 1 if you have the `crypto\' library (-lcrypto). */
 @%:@undef HAVE_LIBCRYPTO])
-m4trace:configure.ac:13: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBCRYPTO])
-m4trace:configure.ac:13: -1- m4_pattern_allow([^HAVE_LIBCRYPTO$])
-m4trace:configure.ac:13: -1- AH_OUTPUT([HAVE_LIBZ], [/* Define to 1 if you have the `z\' library (-lz). */
-@%:@undef HAVE_LIBZ])
-m4trace:configure.ac:13: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBZ])
-m4trace:configure.ac:13: -1- m4_pattern_allow([^HAVE_LIBZ$])
-m4trace:configure.ac:18: -1- AH_OUTPUT([HAVE_LIBUSEFUL], [/* Define to 1 if you have the `Useful\' library (-lUseful). */
-@%:@undef HAVE_LIBUSEFUL])
-m4trace:configure.ac:18: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBUSEFUL])
-m4trace:configure.ac:18: -1- m4_pattern_allow([^HAVE_LIBUSEFUL$])
-m4trace:configure.ac:24: -1- AC_SUBST([STATIC_LIBS])
-m4trace:configure.ac:24: -1- AC_SUBST_TRACE([STATIC_LIBS])
-m4trace:configure.ac:24: -1- m4_pattern_allow([^STATIC_LIBS$])
-m4trace:configure.ac:25: -1- AC_CONFIG_SUBDIRS([libUseful-4])
-m4trace:configure.ac:25: -1- AC_SUBST([subdirs], ["$subdirs m4_normalize([libUseful-4])"])
-m4trace:configure.ac:25: -1- AC_SUBST_TRACE([subdirs])
-m4trace:configure.ac:25: -1- m4_pattern_allow([^subdirs$])
-m4trace:configure.ac:30: -1- AC_CONFIG_FILES([Makefile])
-m4trace:configure.ac:30: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
+m4trace:configure.ac:36: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBCRYPTO])
+m4trace:configure.ac:36: -1- m4_pattern_allow([^HAVE_LIBCRYPTO$])
+m4trace:configure.ac:41: -1- AC_SUBST([LIBUSEFUL_BUNDLED], [""])
+m4trace:configure.ac:41: -1- AC_SUBST_TRACE([LIBUSEFUL_BUNDLED])
+m4trace:configure.ac:41: -1- m4_pattern_allow([^LIBUSEFUL_BUNDLED$])
+m4trace:configure.ac:44: -1- AH_OUTPUT([HAVE_LIBUSEFUL_4], [/* Define to 1 if you have the `Useful-4\' library (-lUseful-4). */
+@%:@undef HAVE_LIBUSEFUL_4])
+m4trace:configure.ac:44: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBUSEFUL_4])
+m4trace:configure.ac:44: -1- m4_pattern_allow([^HAVE_LIBUSEFUL_4$])
+m4trace:configure.ac:48: -1- AH_OUTPUT([HAVE_LIBSSL], [/* Define to 1 if you have the `ssl\' library (-lssl). */
+@%:@undef HAVE_LIBSSL])
+m4trace:configure.ac:48: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBSSL])
+m4trace:configure.ac:48: -1- m4_pattern_allow([^HAVE_LIBSSL$])
+m4trace:configure.ac:49: -1- AH_OUTPUT([HAVE_LIBCRYPTO], [/* Define to 1 if you have the `crypto\' library (-lcrypto). */
+@%:@undef HAVE_LIBCRYPTO])
+m4trace:configure.ac:49: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBCRYPTO])
+m4trace:configure.ac:49: -1- m4_pattern_allow([^HAVE_LIBCRYPTO$])
+m4trace:configure.ac:52: -1- AC_SUBST([LIBUSEFUL_BUNDLED], ["libUseful-4/libUseful.a"])
+m4trace:configure.ac:52: -1- AC_SUBST_TRACE([LIBUSEFUL_BUNDLED])
+m4trace:configure.ac:52: -1- m4_pattern_allow([^LIBUSEFUL_BUNDLED$])
+m4trace:configure.ac:53: -1- AC_CONFIG_SUBDIRS([libUseful-4])
+m4trace:configure.ac:53: -1- AC_SUBST([subdirs], ["$subdirs m4_normalize([libUseful-4])"])
+m4trace:configure.ac:53: -1- AC_SUBST_TRACE([subdirs])
+m4trace:configure.ac:53: -1- m4_pattern_allow([^subdirs$])
+m4trace:configure.ac:58: -1- AC_CONFIG_FILES([Makefile])
+m4trace:configure.ac:58: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])
-m4trace:configure.ac:30: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
-m4trace:configure.ac:30: -1- AC_SUBST_TRACE([LIB@&t@OBJS])
-m4trace:configure.ac:30: -1- m4_pattern_allow([^LIB@&t@OBJS$])
-m4trace:configure.ac:30: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])
-m4trace:configure.ac:30: -1- AC_SUBST_TRACE([LTLIBOBJS])
-m4trace:configure.ac:30: -1- m4_pattern_allow([^LTLIBOBJS$])
-m4trace:configure.ac:30: -1- AC_SUBST_TRACE([top_builddir])
-m4trace:configure.ac:30: -1- AC_SUBST_TRACE([top_build_prefix])
-m4trace:configure.ac:30: -1- AC_SUBST_TRACE([srcdir])
-m4trace:configure.ac:30: -1- AC_SUBST_TRACE([abs_srcdir])
-m4trace:configure.ac:30: -1- AC_SUBST_TRACE([top_srcdir])
-m4trace:configure.ac:30: -1- AC_SUBST_TRACE([abs_top_srcdir])
-m4trace:configure.ac:30: -1- AC_SUBST_TRACE([builddir])
-m4trace:configure.ac:30: -1- AC_SUBST_TRACE([abs_builddir])
-m4trace:configure.ac:30: -1- AC_SUBST_TRACE([abs_top_builddir])
+m4trace:configure.ac:58: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
+m4trace:configure.ac:58: -1- AC_SUBST_TRACE([LIB@&t@OBJS])
+m4trace:configure.ac:58: -1- m4_pattern_allow([^LIB@&t@OBJS$])
+m4trace:configure.ac:58: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])
+m4trace:configure.ac:58: -1- AC_SUBST_TRACE([LTLIBOBJS])
+m4trace:configure.ac:58: -1- m4_pattern_allow([^LTLIBOBJS$])
+m4trace:configure.ac:58: -1- AC_SUBST_TRACE([top_builddir])
+m4trace:configure.ac:58: -1- AC_SUBST_TRACE([top_build_prefix])
+m4trace:configure.ac:58: -1- AC_SUBST_TRACE([srcdir])
+m4trace:configure.ac:58: -1- AC_SUBST_TRACE([abs_srcdir])
+m4trace:configure.ac:58: -1- AC_SUBST_TRACE([top_srcdir])
+m4trace:configure.ac:58: -1- AC_SUBST_TRACE([abs_top_srcdir])
+m4trace:configure.ac:58: -1- AC_SUBST_TRACE([builddir])
+m4trace:configure.ac:58: -1- AC_SUBST_TRACE([abs_builddir])
+m4trace:configure.ac:58: -1- AC_SUBST_TRACE([abs_top_builddir])

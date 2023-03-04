@@ -1,11 +1,11 @@
 VERSION=1.6
 CC=@CC@
-LIBS=@LDFLAGS@ @LIBS@ @STATIC_LIBS@
+LIBS=@LDFLAGS@ @LIBS@ @LIBUSEFUL_BUNDLED@
 FLAGS=@CFLAGS@ -DVERSION=\"$(VERSION)\"
 
 OBJ=common.o net.o netdev.o runcommand.o iw.o wireless_tools.o wpa_supplicant.o wifi.o interactive.o settings.o help.o
 
-all: $(OBJ) @STATIC_LIBS@
+all: $(OBJ) @LIBUSEFUL_BUNDLED@
 	$(CC) $(FLAGS)  -oterm_wifi $(OBJ) main.c $(LIBS)
 
 libUseful-4/libUseful.a:
