@@ -15,22 +15,22 @@ TNetDev *NetDevCreate(const char *Name, int Flags)
 
 TNetDev *NetDevClone(TNetDev *Parent)
 {
-TNetDev *Dev;
+    TNetDev *Dev;
 
-Dev=NetDevCreate(Parent->Name, Parent->Flags);
-Dev->Driver=CopyStr(Dev->Driver, Parent->Driver);
+    Dev=NetDevCreate(Parent->Name, Parent->Flags);
+    Dev->Driver=CopyStr(Dev->Driver, Parent->Driver);
 
-return(Dev);
+    return(Dev);
 }
 
 void NetDevDestroy(void *p_Item)
 {
-TNetDev *Dev;
+    TNetDev *Dev;
 
-Dev=(TNetDev *) p_Item;
-Destroy(Dev->Name);
-Destroy(Dev->Driver);
-free(Dev);
+    Dev=(TNetDev *) p_Item;
+    Destroy(Dev->Name);
+    Destroy(Dev->Driver);
+    free(Dev);
 }
 
 
@@ -75,7 +75,7 @@ int NetDevLoadInterfaces(ListNode *Interfaces)
 
     Destroy(Tempstr);
 
-		return(ListSize(Interfaces));
+    return(ListSize(Interfaces));
 }
 
 
