@@ -129,7 +129,7 @@ char *OutputFormatNet(char *Output, TNet *Net)
     if (Net->Flags & NET_RSN) Output=CatStr(Output, "~gRSN ~0 ");
     else if (Net->Flags & NET_WPA2) Output=CatStr(Output, "~gWPA2~0 ");
     else if (Net->Flags & NET_WPA1) Output=CatStr(Output, "~gWPA1~0 ");
-    else if (Net->Flags & NET_WEP) Output=CatStr(Output, "~bWEP ~0  ");
+    else if (Net->Flags & NET_WEP) Output=CatStr(Output, "~bWEP ~0 ");
     else Output=CatStr(Output, "~rOPEN~0 ");
 
     if (Net->Quality > 0)
@@ -156,7 +156,7 @@ char *OutputFormatNet(char *Output, TNet *Net)
     Tempstr=FormatStr(Tempstr, "  %0.1fMb/s   chan:%03d  %s  ", Rate, Net->Channel, Net->AccessPoint);
     Output=CatStr(Output, Tempstr);
 
-    Output=MCatStr(Output, "~e", Net->ESSID, "~0 ", NULL);
+    if (StrValid(Net->ESSID)) Output=MCatStr(Output, "~e", Net->ESSID, "~0 ", NULL);
 
     Destroy(Tempstr);
 
