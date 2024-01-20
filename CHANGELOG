@@ -1,0 +1,48 @@
+v3.0 (2024-01-20)
+  * command-line qrcode export support
+  * sudo support 
+
+v2.1 (2023-03-04)
+=================
+  * support libUseful-5
+  * Create LICENSE
+
+v2.0 (2022-10-21)
+=================
+  * display options for known and open nets
+  * channel numbers can be 3 digits!
+  * add 'change interface' screen
+  * added 'list interfaces' action
+
+v1.5 (2020-06-18)
+=================
+  * fix for stuck process left when terminal closed
+
+v1.4 (2020-06-06)
+=================
+  * country-code/regulatory option added
+  * add country code for wpa_supplicant
+  * Better command-line parsing. Handle devices that require using other wpa_supplicant drivers than nl80211
+
+v1.3 (2020-04-30)
+=================
+  * Fix for 'last character missing' issue with user-inputed strings, like network passphrases
+
+v1.2 (2020-04-28)
+=================
+  * You can now back out of entering network details and cancel joining a network
+
+v1.1 (2020-03-24)
+=================
+  * don't mess up config file is items like 'username' aren't set
+  * changes for networks using username and password
+
+v1.0 (2019-12-15)
+=================
+  * use iw if iwconfig not available
+  * handle open wifi networks
+  * fix return value to allow compile under clang
+  * Don't launch DHCPCD until wifi is associated
+  * better behaved bottom bar
+  * code tidyup, added README.md, added .travis.yml
+  * initial commit

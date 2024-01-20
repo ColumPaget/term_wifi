@@ -58,6 +58,7 @@ void QueryRootPassword(const char *Prompt)
     S=STREAMFromDualFD(0,1);
     Settings.RootPassword=TerminalReadPrompt(Settings.RootPassword, Prompt, TERM_SHOWSTARS, S);
     StripCRLF(Settings.RootPassword);
+    TerminalPutStr("\r~>~0", S);
     STREAMDestroy(S);
 }
 
@@ -104,6 +105,12 @@ void NetDestroy(void *p_Net)
     free(Net);
 }
 
+
+void NetSetESSID(TNet *Net, const char *ESSID)
+{
+    Net->ESSID=ReplaceStr(Net->ESSID, ESSID, "\\x00", "");
+    StripQuotes(Net->ESSID);
+}
 
 
 const char *OutputNetQualityColor(TNet *Net)
@@ -163,3 +170,29 @@ char *OutputFormatNet(char *Output, TNet *Net)
     return(Output);
 }
 
+
+char *FindCommandFromList(char *RetStr, const char *CmdList)
+{
+    char *Token=NULL, *Cmd=NULL;
+    const char *ptr, *args;
+
+    RetStr=CopyStr(RetStr, "");
+    ptr=GetToken(CmdList, ",", &Token, 0);
+    while (ptr)
+    {
+//Command might have arguments, so extract first word
+        args=GetToken(Token, "\\S", &Cmd, 0);
+        RetStr=FindFileInPath(RetStr, Cmd, getenv("PATH"));
+        if (StrValid(RetStr))
+        {
+            if (StrValid(args)) RetStr=MCatStr(RetStr, " ", args, NULL);
+            break;
+        }
+        ptr=GetToken(ptr, ",", &Token, 0);
+    }
+
+    Destroy(Token);
+    Destroy(Cmd);
+
+    return(RetStr);
+}

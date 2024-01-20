@@ -71,4 +71,7 @@ char *OutputFormatNet(char *Output, TNet *Net);
 int FrequencyToChannel(int freq);
 void QueryRootPassword(const char *Prompt);
 
+void NetSetESSID(TNet *Net, const char *ESSID);
+
+char *FindCommandFromList(char *RetStr, const char *List);
 #endif

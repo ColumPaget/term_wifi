@@ -8,6 +8,7 @@ void SettingsInit()
 
     Settings.PidsDir=CopyStr(Settings.PidsDir, DEFAULT_PIDS_DIR);
     Settings.ConfigFile=CopyStr(Settings.ConfigFile, DEFAULT_CONFIG_FILE);
+    Settings.ImageViewer=CopyStr(Settings.ImageViewer, "imlib2_view,fim,feh,display,xv,phototonic,qimageviewer,pix,sxiv,qimgv,qview,nomacs,geeqie,ristretto,mirage,fotowall,links -g,convert,img2sixel -e");
 }
 
 
@@ -31,7 +32,7 @@ ListNode *SettingsLoadNets(const char *Match)
     STREAM *S;
     char *Tempstr=NULL, *Token=NULL;
     const char *ptr;
-    ListNode *Nets=NULL;
+    ListNode *Nets=NULL, *Curr;
     TNet *Net;
 
     Nets=ListCreate();
@@ -51,7 +52,7 @@ ListNode *SettingsLoadNets(const char *Match)
 
                 if ( (! StrValid(Match)) || (strcasecmp(Match, ptr)==0) )
                 {
-                    Net=(TNet *) calloc(1, sizeof(TNet));
+                    Net=NetCreate();
                     Net->ESSID=CopyStr(Net->ESSID, ptr);
                     Net->AccessPoint=CopyStr(Net->AccessPoint, "");
                     ListAddNamedItem(Nets, Net->ESSID, Net);
@@ -60,7 +61,8 @@ ListNode *SettingsLoadNets(const char *Match)
             else if (Net)
             {
                 if (strcmp(Token, "wpa1")==0) Net->Flags |= NET_WPA1;
-                if (strcmp(Token, "wpa1")==0) Net->Flags |= NET_WPA1;
+                if (strcmp(Token, "wpa2")==0) Net->Flags |= NET_WPA2;
+                if (strcmp(Token, "wep")==0) Net->Flags |= NET_WEP;
                 if (strcmp(Token, "rsn")==0) Net->Flags |= NET_RSN;
                 if (strcmp(Token, "user")==0) Net->UserID=CopyStr(Net->UserID, ptr);
                 if (strcmp(Token, "key")==0) Net->Key=CopyStr(Net->Key, ptr);
@@ -76,6 +78,15 @@ ListNode *SettingsLoadNets(const char *Match)
             Tempstr=STREAMReadLine(Tempstr, S);
         }
         STREAMClose(S);
+    }
+
+
+    Curr=ListGetNext(Nets);
+    while (Curr)
+    {
+        Net=(TNet *) Curr->Item;
+        if (StrValid(Net->Key) && (! (Net->Flags & NET_ENCRYPTED)) ) Net->Flags |= NET_WPA2;
+        Curr=ListGetNext(Curr);
     }
 
     Destroy(Tempstr);
@@ -108,6 +119,7 @@ void SettingsSaveNets(ListNode *List)
             if (Net->Flags & NET_RSN) STREAMWriteLine("rsn\n", S);
             if (Net->Flags & NET_WPA2) STREAMWriteLine("wpa2\n", S);
             if (Net->Flags & NET_WPA1) STREAMWriteLine("wpa1\n", S);
+            if (Net->Flags & NET_WEP) STREAMWriteLine("wep\n", S);
 
             if (StrValid(Net->CountryCode))
             {
@@ -214,7 +226,7 @@ void SettingsSaveNet(TNet *Net)
     TNet *tmpNet;
 
     Nets=SettingsLoadNets(NULL);
-    tmpNet=(TNet *) calloc(1, sizeof(TNet));
+    tmpNet=NetCreate();
     tmpNet->ESSID=CopyStr(tmpNet->ESSID, Net->ESSID);
     tmpNet->UserID=CopyStr(tmpNet->UserID, Net->UserID);
     tmpNet->Key=CopyStr(tmpNet->Key, Net->Key);

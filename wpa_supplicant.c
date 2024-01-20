@@ -43,7 +43,7 @@ static int WPASupplicantParseNetwork(const char *Data, ListNode *Networks)
         ptr=GetToken(Data, "	", &Token, 0);
         if (strcmp(Token, "bssid") !=0)
         {
-            Net=(TNet *) calloc(1, sizeof(TNet));
+            Net=NetCreate();
             Net->AccessPoint=CopyStr(Net->AccessPoint, Token);
             ptr=GetToken(ptr, "	", &Token, 0);
             Net->Channel=FrequencyToChannel(atoi(Token));

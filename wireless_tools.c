@@ -7,7 +7,7 @@ static TNet *WirelessToolsParseCell(const char *Config)
     const char *ptr;
     TNet *Net;
 
-    Net=(TNet *) calloc(1, sizeof(TNet));
+    Net=(TNet *) NetCreate();
     ptr=GetToken(Config, "\\S", &Token, 0);
     while (ptr)
     {
@@ -71,15 +71,11 @@ static void WirelessToolsParseBitRates(TNet *Net, const char *Rates)
 
 static void WirelessToolsGetNetworksParseLine(TNet *Net, const char *Line)
 {
-    char *Key=NULL;
+    char *Key=NULL, *Tempstr=NULL;
     const char *ptr;
 
     ptr=GetToken(Line, ":|=", &Key, GETTOKEN_MULTI_SEP);
-    if (strcmp(Key, "ESSID")==0)
-    {
-        Net->ESSID=CopyStr(Net->ESSID, ptr);
-        StripQuotes(Net->ESSID);
-    }
+    if (strcmp(Key, "ESSID")==0) NetSetESSID(Net, ptr);
     else if (strcmp(Key, "Channel")==0) Net->Channel=atoi(ptr);
     else if (strcmp(Key, "Quality")==0) WifiToolsParseQuality(ptr, Net);
     else if (strcmp(Key, "Mode")==0)
@@ -98,6 +94,7 @@ static void WirelessToolsGetNetworksParseLine(TNet *Net, const char *Line)
     else if (strcmp(Key, "Bit Rates")==0) WirelessToolsParseBitRates(Net, ptr);
 
     Destroy(Key);
+    Destroy(Tempstr);
 }
 
 
@@ -219,7 +216,8 @@ static const char *WirelessToolsGetStatusParseDifficultItems(TNet *Net, const ch
     {
         ptr=Remainder;
         while (isspace(*ptr)) ptr++;
-        ptr=GetToken(ptr,"\\S",&Net->ESSID,GETTOKEN_QUOTES);
+        ptr=GetToken(ptr,"\\S",&Token,GETTOKEN_QUOTES);
+        NetSetESSID(Net, Token);
     }
 
     Destroy(Token);
@@ -244,7 +242,9 @@ static void WirelessToolsGetStatusParseLine(TNet *Net, char *Line)
         switch (MatchTokenFromList(Token, IwConfigToks, 0))
         {
         case IWCT_ESSID:
-            ptr=GetToken(ptr,"\\S",&Net->ESSID,0);
+            ptr=GetToken(ptr,"\\S",&Token,0);
+            NetSetESSID(Net, Token);
+
             if (
                 (! StrValid(Net->ESSID)) ||
                 (strcasecmp(Net->ESSID,"not-associated")==0)

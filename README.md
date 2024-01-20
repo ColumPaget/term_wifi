@@ -15,6 +15,26 @@ make
 
 This should produce an executable called 'term_wifi' that you can copy to a bin directory.
 
+
+# REQUIRED 'HELPER' PROGRAMS
+
+term_wifi requires iwconfig or iw to be installed for wifi scanning/setup, wpa_supplicant for WPA networks, dhcpcd for dhcp support and ifconfig and route for network setup.
+
+if term_wifi is not run as root, then it will try to use sudo, or if that's not installed, su, to run network commands with root permissions.
+
+qr-code export requires qrencode utility to be installed, and also an image viewer. term_wifi searches for a default list of image viewers, but this can be overridden with the `-viewer` option.
+
+
+
+# INTERACTIVE (USER INTERFACE) MODE
+
+if term_wifi is run without any arguments the user will be presented with a simple terminal user interface. You can use the '-i' option to show the tui for a given wifi device like so:
+
+```
+	term_wifi -i wlan1
+```
+
+
 # USAGE: Command line mode
 
 To view available wifi networks:
@@ -71,16 +91,39 @@ To 'forget' (delete) a configured network
 ```
 
 
-# INTERACTIVE (USER INTERFACE) MODE
 
-if term_wifi is run without any arguments the user will be presented with a simple terminal user interface. You can use the '-i' option to show the tui for a given wifi device like so:
+# COMMAND LINE REFERENCE
 
 ```
-	term_wifi -i wlan1
+  term_wifi interfaces                                                list interfaces
+  term_wifi scan <interface>                                          scan networks and output details
+  term_wifi add <essid> <address> <netmask> <gateway>  <dns server>   add a config for a network
+  term_wifi add <essid> dhcp                                          add a config for a network using dhcp
+  term_wifi forget <essid>                                            delete (forget) network
+  term_wifi list                                                      list configured networks
+  term_wifi join <interface> <essid>                                  join a configured network
+  term_wifi leave <interface>                                         leave current network
+  term_wifi connect <essid>                                           join configured network with default interface
+  term_wifi qrcode <essid>                                            display qr code for saved network with essid '<essid>'
+  term_wifi qrcode <essid> -viewer <list>                             display qr code for saved network with essid '<essid>' using first viewer program found in comma-separated list '<list>'
+  term_wifi qrcode <essid> -o <path>                                  write qr code for network '<essid>' to PNG file at <path>
+  term_wifi -?                                                        this help
+  term_wifi -h                                                        this help
+  term_wifi -help                                                     this help
+  term_wifi --help                                                    this help
+
+options that apply to connect/interactive mode
+  -i <interface>                                                      interface to use
+  -ap <access point mac address>                                      access point to join (if many for same essid)
+  -k <key>                                                            authentication key for given essid/network)
 ```
-
-
-# OPTIONS
 
 you can use `-i <interface>` to specify and interface to use for the 'connect', 'scan' and tui commands.
+
+
+QR CODES
+========
+
+the command-line 'qrcode' action will produce a qrcode PNG and attempt to find an image-viewer to display it. You can specify an image-viewer command using the '-viewer' option. Failing that, term_wifi has an internal list of image-viewer programs to try. After all the image viewers, there are two options that output sixel images to the terminal, provided your terminal supports sixel image display. Finally, if nothing matching is found, the ultimate fallback is to use qrencodes 'ANSI256' display message to create a giant QR code with ANSI graphics.
+
 

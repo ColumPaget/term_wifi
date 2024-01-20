@@ -1,6 +1,5 @@
 #include "runcommand.h"
 #include "settings.h"
-//#include <wait.h>
 #include <sys/wait.h>
 
 ListNode *Commands=NULL;
@@ -64,8 +63,23 @@ char *RunCommand(char *RetStr, const char *Command, int Flags)
 
     if (Flags & RUNCMD_ROOT)
     {
-        p_Path=GetVar(Commands, "su");
-        if (p_Path) Exec=MCopyStr(Exec, "cmd:", p_Path, "  -c '", p_ExecPath, " ", p_args, "'", NULL);
+        p_Path=GetVar(Commands, "sudo");
+        if (StrValid(p_Path))
+        {
+            Exec=MCopyStr(Exec, "cmd:", p_Path, "  -S ", p_ExecPath, " ", p_args, NULL);
+            if (! StrValid(Settings.RootPassword)) QueryRootPassword("~eOperation requires sudo (usually user's) password~0\r\nPassword: ");
+        }
+        else
+        {
+            p_Path=GetVar(Commands, "su");
+            if (StrValid(p_Path))
+            {
+                Exec=MCopyStr(Exec, "cmd:", p_Path, "  -c '", p_ExecPath, " ", p_args, "'", NULL);
+                if (! StrValid(Settings.RootPassword)) QueryRootPassword("~eOperation requires root password~0\r\nPassword: ");
+            }
+        }
+
+        if (! p_Path) printf("ERROR: neither sudo nor su found, operations will likely fail\n");
     }
     else Exec=MCopyStr(Exec, "cmd:", p_ExecPath, " ", p_args, NULL);
 
@@ -83,7 +97,6 @@ char *RunCommand(char *RetStr, const char *Command, int Flags)
                 if (STREAMCountWaitingBytes(S) > 6) break;
                 usleep(10000);
             }
-            if (! StrValid(Settings.RootPassword)) QueryRootPassword("~eOperation requires root password~0\r\nPassword: ");
             Tempstr=MCopyStr(Tempstr, Settings.RootPassword, "\n", NULL);
             STREAMWriteLine(Tempstr, S);
         }

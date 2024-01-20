@@ -1,9 +1,9 @@
-VERSION=1.6
+VERSION=3.0
 CC=gcc
 LIBS= -lcrypto -lssl -lUseful-5  
 FLAGS=-g -O2 -DVERSION=\"$(VERSION)\"
 
-OBJ=common.o net.o netdev.o runcommand.o iw.o wireless_tools.o wpa_supplicant.o wifi.o interactive.o settings.o help.o
+OBJ=common.o net.o netdev.o runcommand.o iw.o wireless_tools.o wpa_supplicant.o wifi.o interactive.o settings.o qrcode.o command_line.o help.o
 
 all: $(OBJ) 
 	$(CC) $(FLAGS)  -oterm_wifi $(OBJ) main.c $(LIBS)
@@ -22,6 +22,9 @@ net.o: net.h net.c common.h
 
 help.o: help.h help.c common.h
 	$(CC) $(FLAGS)  -c help.c
+
+qrcode.o: qrcode.h qrcode.c common.h
+	$(CC) $(FLAGS)  -c qrcode.c
 
 netdev.o: netdev.h netdev.c common.h
 	$(CC) $(FLAGS)  -c netdev.c
@@ -44,9 +47,12 @@ runcommand.o: runcommand.h runcommand.c common.h
 settings.o: settings.h settings.c common.h
 	$(CC) $(FLAGS)  -c settings.c
 
+command_line.o: command_line.h command_line.c common.h
+	$(CC) $(FLAGS)  -c command_line.c
+
 
 clean:
-	rm term_wifi *.o libUseful-4/*.o libUseful-4/*.a libUseful-4/*.so
+	rm term_wifi *.o libUseful-4/*.o libUseful-4/*.a libUseful-4/*.so *.orig
 
 test:
 	echo "no tests"

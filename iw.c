@@ -77,7 +77,7 @@ void IWGetNetworks(TNetDev *Dev, ListNode *Networks)
             if (Net) ListAddNamedItem(Networks, Net->ESSID, Net);
 
             //load next network
-            Net=(TNet *) calloc(1, sizeof(TNet));
+            Net=NetCreate();
             GetToken(Tempstr+4, "\\S|(", &Net->AccessPoint, GETTOKEN_MULTI_SEP);
         }
         else if (Net) IWGetNetworksParseLine(Net, Tempstr);

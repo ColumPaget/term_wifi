@@ -4,9 +4,10 @@
 #include "netdev.h"
 #include "settings.h"
 
-#define DISPLAY_ALL_NETS 0
-#define DISPLAY_KNOWN_NETS 1
-#define DISPLAY_OPEN_NETS  2
+#define DISPLAY_ALL_NETS    0
+#define DISPLAY_KNOWN_NETS  1
+#define DISPLAY_OPEN_NETS   2
+#define DISPLAY_OTHER_NETS  4
 
 ListNode *InteractiveNetList=NULL;
 int InteractiveDisplayMode=0;
@@ -38,7 +39,7 @@ static void InteractiveHeaders(TNetDev *Dev, TNet *Net, STREAM *Out)
 }
 
 
-static void InteractiveWifiMenuUpdate(TERMMENU *Menu)
+static void InteractiveWifiMenuRefresh(TERMMENU *Menu)
 {
     ListNode *Curr;
 
@@ -51,6 +52,32 @@ static void InteractiveWifiMenuUpdate(TERMMENU *Menu)
 }
 
 
+
+static void InteractiveWifiMenuUpdate(TERMMENU *Menu)
+{
+//header for menu
+    TerminalCursorMove(StdIO, 0, 6);
+
+    switch (InteractiveDisplayMode)
+    {
+    case DISPLAY_OPEN_NETS:
+        TerminalPutStr("  Open networks that are currently visible:~>", StdIO);
+        break;
+    case DISPLAY_KNOWN_NETS:
+        TerminalPutStr("  Known networks that are currently visible:~>", StdIO);
+        break;
+    case DISPLAY_OTHER_NETS:
+        TerminalPutStr("  Known networks:~>", StdIO);
+        break;
+    default:
+        TerminalPutStr("  Available networks: Those marked with a leading '*' have saved configs~>", StdIO);
+        break;
+    }
+
+    InteractiveWifiMenuRefresh(Menu);
+}
+
+
 static void InteractiveTitleBar(TNetDev *Dev, const char *Str)
 {
     TNet *Net;
@@ -60,8 +87,7 @@ static void InteractiveTitleBar(TNetDev *Dev, const char *Str)
     Tempstr=MCopyStr(Tempstr, Str, "~>~0", NULL);
     TerminalPutStr(Tempstr, StdIO);
 
-
-    Net=(TNet *) calloc(1, sizeof(TNet));
+    Net=NetCreate();
     InteractiveHeaders(Dev, Net, StdIO);
 
     Destroy(Tempstr);
@@ -87,7 +113,10 @@ static void InteractiveWifiNetworksReload(TERMMENU *Menu, ListNode *Networks)
     ConfiguredNets=SettingsLoadNets(NULL);
 
     ListClear(Menu->Options, NULL);
-    Curr=ListGetNext(Networks);
+
+    if (InteractiveDisplayMode == DISPLAY_OTHER_NETS) Curr=ListGetNext(ConfiguredNets);
+    else Curr=ListGetNext(Networks);
+
     while (Curr)
     {
         Net=(TNet *) Curr->Item;
@@ -109,8 +138,19 @@ static void InteractiveWifiNetworksReload(TERMMENU *Menu, ListNode *Networks)
 
 static void InteractiveWifiScan(TNetDev *Dev, TERMMENU *Menu)
 {
+    InteractiveTitleBar(Dev, "~R~w Please wait, scanning for wireless networks");
+
+// move cursor in case 'InteractiveWifiScan' asks for a root password,
+//otherwise we will overwrite the Title bar with the request
+    TerminalCursorMove(StdIO, 0, 6);
+
     if (! InteractiveNetList) InteractiveNetList=ListCreate();
     InteractiveNetList=WifiGetNetworks(Dev);
+
+//clear any leftover text from password query
+    TerminalCursorMove(StdIO, 0, 6);
+    TerminalPutStr("~>\n~>\n~>\n~>\n", StdIO);
+
     InteractiveWifiNetworksReload(Menu, InteractiveNetList);
 }
 
@@ -118,22 +158,8 @@ void InteractiveWifiUpdate(TNetDev *Dev, STREAM *StdIO, TERMMENU *Menu, int wid,
 {
     DisplayStatus=InteractiveTitleBar;
 
-    InteractiveTitleBar(Dev, "~R~w Please wait, scanning for wireless networks");
-
-// move cursor in case 'InteractiveWifiScan' asks for a root password,
-//otherwise we will overwrite the Title bar with the request
-    TerminalCursorMove(StdIO, 0, 6);
-    InteractiveWifiScan(Dev, Menu);
-
-//clear any leftover text from password query
-    TerminalCursorMove(StdIO, 0, 6);
-    TerminalPutStr("~>\n~>\n~>\n~>\n", StdIO);
-
-//header for menu
-    TerminalCursorMove(StdIO, 0, 6);
-    TerminalPutStr("  Available networks: Those marked with a leading '*' have saved configs", StdIO);
-
     InteractiveBottomBar(StdIO, wid, len);
+    InteractiveWifiScan(Dev, Menu);
 }
 
 
@@ -273,7 +299,7 @@ void InteractiveJoinNetwork(TNetDev *Dev, TNet *Conf, STREAM *Out)
         if (! InteractiveQueryNetConfig(Dev, Conf)) return;
     }
 
-    Net=(TNet *) calloc(1, sizeof(TNet));
+    Net=NetCreate();
 
     InteractiveTitleBar(Dev, "~M~w joining network");
     while (1)
@@ -389,6 +415,8 @@ void Interactive(TNetDev *iDev)
         case 'i':
             InteractiveChangeInterface(Dev);
             InteractiveWifiUpdate(Dev, StdIO, Menu, wid, len);
+						break;
+
         case 'd':
             NetDown(Dev);
             break;
@@ -398,7 +426,7 @@ void Interactive(TNetDev *iDev)
             {
                 Net=(TNet *) Menu->Options->Side->Item;
                 SettingsForgetNet(Net->ESSID);
-                InteractiveWifiNetworksReload(Menu, InteractiveNetList);
+            		InteractiveWifiNetworksReload(Menu, InteractiveNetList);
             }
             break;
 
@@ -414,6 +442,13 @@ void Interactive(TNetDev *iDev)
             InteractiveWifiNetworksReload(Menu, InteractiveNetList);
             break;
 
+        case 'h':
+            if (InteractiveDisplayMode != DISPLAY_OTHER_NETS) InteractiveDisplayMode=DISPLAY_OTHER_NETS;
+            else InteractiveDisplayMode=DISPLAY_ALL_NETS;
+            InteractiveWifiNetworksReload(Menu, InteractiveNetList);
+            break;
+            break;
+
         default:
             Curr=TerminalMenuOnKey(Menu, ch);
             if (Curr)
@@ -423,7 +458,7 @@ void Interactive(TNetDev *iDev)
                 SettingsConfigureNet(Net);
 
                 InteractiveJoinNetwork(Dev, Net, StdIO);
-                InteractiveWifiNetworksReload(Menu, InteractiveNetList);
+            		InteractiveWifiNetworksReload(Menu, InteractiveNetList);
                 TerminalMenuDraw(Menu);
 
             }

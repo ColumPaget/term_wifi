@@ -17,6 +17,8 @@ char *PidsDir;
 char *ConfigFile;
 char *RootPassword;
 char *WPASupplicantSock;
+char *OutputPath;
+char *ImageViewer;
 } TSettings;
 
 extern TSettings Settings;
