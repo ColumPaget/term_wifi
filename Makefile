@@ -1,7 +1,12 @@
-VERSION=3.0
+VERSION=3.1
 CC=gcc
 LIBS= -lcrypto -lssl -lUseful-5  
 FLAGS=-g -O2 -DVERSION=\"$(VERSION)\"
+prefix=/usr/local
+exec_prefix=${prefix}
+BINDIR=${exec_prefix}/bin
+man_prefix=@man_prefix@
+MANDIR=${prefix}/share/man
 
 OBJ=common.o net.o netdev.o runcommand.o iw.o wireless_tools.o wpa_supplicant.o wifi.o interactive.o settings.o qrcode.o command_line.o help.o
 
@@ -53,6 +58,13 @@ command_line.o: command_line.h command_line.c common.h
 
 clean:
 	rm term_wifi *.o libUseful-4/*.o libUseful-4/*.a libUseful-4/*.so *.orig
+
+install:
+	mkdir -p $(BINDIR)
+	cp -f term_wifi $(BINDIR)
+	mkdir -p $(MANDIR)/man1
+	cp -f term_wifi.1 $(MANDIR)/man1
+	
 
 test:
 	echo "no tests"

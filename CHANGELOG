@@ -1,3 +1,10 @@
+v3.1 (2024-03-08)
+  * handle Roy Marples DHCPCD default pid file
+	* added '--version' option
+	* added '-viewer sixel' option
+  * added manpage
+	* added 'make install'
+	
 v3.0 (2024-01-20)
   * command-line qrcode export support
   * sudo support 

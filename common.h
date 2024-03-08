@@ -61,6 +61,7 @@ extern STREAM *StdIO;
 typedef void (*INTERACTIVE_STATUS_CALLBACK)(TNetDev *Dev, const char *Text);
 
 extern INTERACTIVE_STATUS_CALLBACK DisplayStatus;
+void PidPathKill(const char *Path);
 void PidFileKill(const char *AppName);
 TNet *NetCreate();
 void NetDestroy(void *p_Net);

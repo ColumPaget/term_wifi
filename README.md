@@ -106,6 +106,7 @@ To 'forget' (delete) a configured network
   term_wifi connect <essid>                                           join configured network with default interface
   term_wifi qrcode <essid>                                            display qr code for saved network with essid '<essid>'
   term_wifi qrcode <essid> -viewer <list>                             display qr code for saved network with essid '<essid>' using first viewer program found in comma-separated list '<list>'
+  term_wifi qrcode <essid> -viewer "sixel"                            display qr code using terminal's sixel support
   term_wifi qrcode <essid> -o <path>                                  write qr code for network '<essid>' to PNG file at <path>
   term_wifi -?                                                        this help
   term_wifi -h                                                        this help
@@ -116,6 +117,7 @@ options that apply to connect/interactive mode
   -i <interface>                                                      interface to use
   -ap <access point mac address>                                      access point to join (if many for same essid)
   -k <key>                                                            authentication key for given essid/network)
+  -w <path>                                                           path to control sock of existing/running wpa_supplicant
 ```
 
 you can use `-i <interface>` to specify and interface to use for the 'connect', 'scan' and tui commands.
@@ -124,6 +126,19 @@ you can use `-i <interface>` to specify and interface to use for the 'connect', 
 QR CODES
 ========
 
-the command-line 'qrcode' action will produce a qrcode PNG and attempt to find an image-viewer to display it. You can specify an image-viewer command using the '-viewer' option. Failing that, term_wifi has an internal list of image-viewer programs to try. After all the image viewers, there are two options that output sixel images to the terminal, provided your terminal supports sixel image display. Finally, if nothing matching is found, the ultimate fallback is to use qrencodes 'ANSI256' display message to create a giant QR code with ANSI graphics.
+the command-line 'qrcode' action will produce a qrcode PNG and attempt to find an image-viewer to display it. You can specify an image-viewer command using the '-viewer' option. Failing that, term_wifi has an internal list of image-viewer programs to try. Currently this default list is:
+
+```
+    imlib2_view, fim, feh, display, xv, phototonic, qimageviewer, pix, sxiv, qimgv, qview, nomacs, geeqie, ristretto, mirage, fotowall, links -g, convert, img2sixel -e
+```
+The '-viewer' option can be used to alter this list, like so:
+
+```
+   term_wifi -qrcode mynet -viewer "imgview,fim,xv"
+```
+
+If no image viewers are found, there are two options at the end of this list that output sixel images to the terminal, provided your terminal supports sixel image display. To force use of sixel images use '-viewer sixel'.
+
+Finally, if nothing matching is found, the ultimate fallback is to use qrencodes 'ANSI256' display message to create a giant QR code with ANSI graphics.
 
 

@@ -164,13 +164,19 @@ int main(int argc, char *argv[])
             Interactive(Dev);
             break;
 
+        case ACT_IFACE_LIST:
+            ListInterfaces();
+            break;
+
+        case ACT_VERSION:
+						printf("term_wifi %s\n", VERSION);
+            break;
+
         case ACT_HELP:
             DisplayHelp();
             break;
 
-        case ACT_IFACE_LIST:
-            ListInterfaces();
-            break;
+
         }
     }
 

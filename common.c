@@ -24,13 +24,12 @@ void SendSignal(pid_t pid, int Sig)
 }
 
 
-void PidFileKill(const char *AppName)
+void PidPathKill(const char *Path)
 {
-    char *Path=NULL, *Tempstr=NULL;
+    char *Tempstr=NULL;
     STREAM *S;
     pid_t pid;
 
-    Path=MCopyStr(Path, Settings.PidsDir, "/", AppName, ".pid", NULL);
     S=STREAMOpen(Path, "r");
     if (S)
     {
@@ -47,6 +46,16 @@ void PidFileKill(const char *AppName)
     }
 
     Destroy(Tempstr);
+}
+
+
+void PidFileKill(const char *AppName)
+{
+    char *Path=NULL;
+
+    Path=MCopyStr(Path, Settings.PidsDir, "/", AppName, ".pid", NULL);
+		PidPathKill(Path);
+
     Destroy(Path);
 }
 

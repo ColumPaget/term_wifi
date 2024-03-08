@@ -77,6 +77,7 @@ int ParseCommandLine(int argc, char *argv[], TNet *Conf)
             Conf->ESSID=CopyStr(Conf->ESSID, CommandLineNext(CL));
         }
         else if (strcmp(ptr, "help")==0) Act=ACT_HELP;
+        else if (strcmp(ptr, "version")==0) Act=ACT_VERSION;
     }
 
 
@@ -88,13 +89,20 @@ int ParseCommandLine(int argc, char *argv[], TNet *Conf)
         else if (strcmp(ptr, "-h")==0) Act=ACT_HELP;
         else if (strcmp(ptr, "-help")==0) Act=ACT_HELP;
         else if (strcmp(ptr, "--help")==0) Act=ACT_HELP;
+        else if (strcmp(ptr, "-version")==0) Act=ACT_VERSION;
+        else if (strcmp(ptr, "--version")==0) Act=ACT_VERSION;
         else if (strcmp(ptr, "-i")==0) Conf->Interface=CopyStr(Conf->Interface, CommandLineNext(CL));
         else if (strcmp(ptr, "-ap")==0) Conf->AccessPoint=CopyStr(Conf->AccessPoint, CommandLineNext(CL));
         else if (strcmp(ptr, "-k")==0) Conf->Key=CopyStr(Conf->Key, CommandLineNext(CL));
         else if (strcmp(ptr, "-w")==0) Settings.WPASupplicantSock=CopyStr(Settings.WPASupplicantSock, CommandLineNext(CL));
         else if (strcmp(ptr, "-o")==0) Settings.OutputPath=CopyStr(Settings.OutputPath, CommandLineNext(CL));
         else if (strcmp(ptr, "-viewer")==0) Settings.ImageViewer=CopyStr(Settings.ImageViewer, CommandLineNext(CL));
-        else if (strcmp(ptr, "-view")==0) Settings.ImageViewer=CopyStr(Settings.ImageViewer, CommandLineNext(CL));
+        else if (strcmp(ptr, "-view")==0) 
+				{
+					ptr=CommandLineNext(CL);
+					if (strcasecmp(ptr, "sixel")==0) Settings.ImageViewer=CopyStr(Settings.ImageViewer, "img2sixel -e,convert");
+					else Settings.ImageViewer=CopyStr(Settings.ImageViewer, CommandLineNext(CL));
+				}
 
         ptr=CommandLineNext(CL);
     }
