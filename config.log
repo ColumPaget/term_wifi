@@ -44,6 +44,7 @@ PATH: /opt/Python-3.7.1/bin
 PATH: /opt/Qt5/bin
 PATH: /opt/SDL/bin
 PATH: /opt/SDL2/bin
+PATH: /opt/bluez-5.72/bin
 PATH: /opt/boinc_client-7.14.2/bin
 PATH: /opt/chess/bin
 PATH: /opt/games/bin

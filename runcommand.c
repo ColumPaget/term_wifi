@@ -87,6 +87,7 @@ char *RunCommand(char *RetStr, const char *Command, int Flags)
     if (Flags & RUNCMD_DAEMON) Tempstr=CatStr(Tempstr, " daemon");
     if (Flags & RUNCMD_NOSHELL) Tempstr=CatStr(Tempstr, " noshell");
 
+printf("RUN COMMAND: %s\n", Exec);
     S=STREAMOpen(Exec, Tempstr);
     if (S)
     {

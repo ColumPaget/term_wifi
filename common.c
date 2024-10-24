@@ -54,7 +54,7 @@ void PidFileKill(const char *AppName)
     char *Path=NULL;
 
     Path=MCopyStr(Path, Settings.PidsDir, "/", AppName, ".pid", NULL);
-		PidPathKill(Path);
+    PidPathKill(Path);
 
     Destroy(Path);
 }

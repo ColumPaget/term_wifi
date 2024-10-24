@@ -6,19 +6,19 @@
 //different versions of DHCPCD have different pidfile locations
 static void DHCPCDKill(TNetDev *Interface)
 {
-char *Tempstr=NULL;
+    char *Tempstr=NULL;
 
-Tempstr=MCopyStr(Tempstr, Settings.PidsDir, "/dhcpcd/", Interface->Name, ".pid", NULL);
-PidPathKill(Tempstr);
+    Tempstr=MCopyStr(Tempstr, Settings.PidsDir, "/dhcpcd/", Interface->Name, ".pid", NULL);
+    PidPathKill(Tempstr);
 
-Tempstr=MCopyStr(Tempstr, "dhcpcd-", Interface->Name, NULL);
-PidFileKill(Tempstr);
+    Tempstr=MCopyStr(Tempstr, "dhcpcd-", Interface->Name, NULL);
+    PidFileKill(Tempstr);
 
-Tempstr=MCopyStr(Tempstr, "dhclient-", Interface->Name, NULL);
-PidFileKill(Tempstr);
-usleep(10000);
+    Tempstr=MCopyStr(Tempstr, "dhclient-", Interface->Name, NULL);
+    PidFileKill(Tempstr);
+    usleep(10000);
 
-Destroy(Tempstr);
+    Destroy(Tempstr);
 }
 
 
@@ -29,8 +29,8 @@ void NetSetupInterface(TNetDev *Interface, const char *Address, const char *Netm
 
     if ( StrValid(Address) && (strcmp(Address, "dhcp")==0) )
     {
-				//Kill off any existing DHCPCD
-				DHCPCDKill(Interface);
+        //Kill off any existing DHCPCD
+        DHCPCDKill(Interface);
 
         if (DisplayStatus) DisplayStatus(Interface, "~Y~nLaunching dhcpcd");
 
@@ -82,7 +82,7 @@ void NetDown(TNetDev *Dev)
     Tempstr=MCopyStr(Tempstr,"wpa_supplicant-",Dev->Name,NULL);
     PidFileKill(Tempstr);
 
-		DHCPCDKill(Dev);
+    DHCPCDKill(Dev);
 
     Tempstr=MCopyStr(Tempstr, "ifconfig ", Dev->Name, " down", NULL);
     Output=RunCommand(Output, Tempstr, RUNCMD_ROOT);

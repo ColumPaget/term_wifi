@@ -76,6 +76,7 @@ int ParseCommandLine(int argc, char *argv[], TNet *Conf)
             Act=ACT_QRCODE;
             Conf->ESSID=CopyStr(Conf->ESSID, CommandLineNext(CL));
         }
+				else if (strcmp(ptr, "status")==0) Act=ACT_STATUS;
         else if (strcmp(ptr, "help")==0) Act=ACT_HELP;
         else if (strcmp(ptr, "version")==0) Act=ACT_VERSION;
     }
@@ -97,12 +98,12 @@ int ParseCommandLine(int argc, char *argv[], TNet *Conf)
         else if (strcmp(ptr, "-w")==0) Settings.WPASupplicantSock=CopyStr(Settings.WPASupplicantSock, CommandLineNext(CL));
         else if (strcmp(ptr, "-o")==0) Settings.OutputPath=CopyStr(Settings.OutputPath, CommandLineNext(CL));
         else if (strcmp(ptr, "-viewer")==0) Settings.ImageViewer=CopyStr(Settings.ImageViewer, CommandLineNext(CL));
-        else if (strcmp(ptr, "-view")==0) 
-				{
-					ptr=CommandLineNext(CL);
-					if (strcasecmp(ptr, "sixel")==0) Settings.ImageViewer=CopyStr(Settings.ImageViewer, "img2sixel -e,convert");
-					else Settings.ImageViewer=CopyStr(Settings.ImageViewer, CommandLineNext(CL));
-				}
+        else if (strcmp(ptr, "-view")==0)
+        {
+            ptr=CommandLineNext(CL);
+            if (strcasecmp(ptr, "sixel")==0) Settings.ImageViewer=CopyStr(Settings.ImageViewer, "img2sixel -e,convert");
+            else Settings.ImageViewer=CopyStr(Settings.ImageViewer, CommandLineNext(CL));
+        }
 
         ptr=CommandLineNext(CL);
     }

@@ -124,6 +124,7 @@ int WirelessToolsGetNetworks(TNetDev *Dev, ListNode *Networks)
 
                 //load next network
                 Net=WirelessToolsParseCell(Tempstr+5);
+        				result=TRUE;
             }
 
             if (Net) WirelessToolsGetNetworksParseLine(Net, Tempstr);
@@ -133,7 +134,6 @@ int WirelessToolsGetNetworks(TNetDev *Dev, ListNode *Networks)
 
         if (Net) ListAddNamedItem(Networks, Net->ESSID, Net);
 
-        result=TRUE;
     }
 
     Destroy(Tempstr);

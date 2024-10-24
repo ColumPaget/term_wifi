@@ -13,14 +13,13 @@ ListNode *InteractiveNetList=NULL;
 int InteractiveDisplayMode=0;
 
 
-static void InteractiveHeaders(TNetDev *Dev, TNet *Net, STREAM *Out)
+void InteractiveHeaders(TNetDev *Dev, TNet *Net, STREAM *Out)
 {
     char *Line=NULL, *Tempstr=NULL;
 
     WifiGetStatus(Dev, Net);
     NetGetStatus(Dev, Net);
 
-    TerminalCursorMove(Out, 0, 2);
     Line=MCopyStr(Line, "    Iface:  ~e", Dev->Name, "~0  ", Net->MacAddress, "\n", NULL);
     if (Net->Flags & NET_ASSOCIATED)
     {
@@ -88,6 +87,7 @@ static void InteractiveTitleBar(TNetDev *Dev, const char *Str)
     TerminalPutStr(Tempstr, StdIO);
 
     Net=NetCreate();
+    TerminalCursorMove(StdIO, 0, 2);
     InteractiveHeaders(Dev, Net, StdIO);
 
     Destroy(Tempstr);
@@ -307,6 +307,7 @@ void InteractiveJoinNetwork(TNetDev *Dev, TNet *Conf, STREAM *Out)
         WifiSetup(Dev, Conf);
         usleep(250000);
 
+    		TerminalCursorMove(Out, 0, 2);
         InteractiveHeaders(Dev, Net, Out);
         if (Net->Flags & NET_ASSOCIATED)
         {
@@ -415,7 +416,7 @@ void Interactive(TNetDev *iDev)
         case 'i':
             InteractiveChangeInterface(Dev);
             InteractiveWifiUpdate(Dev, StdIO, Menu, wid, len);
-						break;
+            break;
 
         case 'd':
             NetDown(Dev);
@@ -426,7 +427,7 @@ void Interactive(TNetDev *iDev)
             {
                 Net=(TNet *) Menu->Options->Side->Item;
                 SettingsForgetNet(Net->ESSID);
-            		InteractiveWifiNetworksReload(Menu, InteractiveNetList);
+                InteractiveWifiNetworksReload(Menu, InteractiveNetList);
             }
             break;
 
@@ -458,7 +459,7 @@ void Interactive(TNetDev *iDev)
                 SettingsConfigureNet(Net);
 
                 InteractiveJoinNetwork(Dev, Net, StdIO);
-            		InteractiveWifiNetworksReload(Menu, InteractiveNetList);
+                InteractiveWifiNetworksReload(Menu, InteractiveNetList);
                 TerminalMenuDraw(Menu);
 
             }

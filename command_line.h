@@ -13,6 +13,7 @@
 #define ACT_FORGET 6
 #define ACT_IFACE_LIST 7
 #define ACT_QRCODE     8
+#define ACT_STATUS 9
 #define ACT_VERSION 98
 #define ACT_HELP    99
 

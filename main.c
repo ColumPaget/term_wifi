@@ -64,6 +64,7 @@ void ScanForNetworks(TNetDev *Dev)
     char *Tempstr=NULL, *Output=NULL;
     TNet *Net;
 
+		//globally visible, used by OutputFormatNet
     ConfiguredNets=SettingsLoadNets(NULL);
     Networks=WifiGetNetworks(Dev);
     Curr=ListGetNext(Networks);
@@ -85,30 +86,11 @@ void ScanForNetworks(TNetDev *Dev)
 
 
 
-
-
-
-int main(int argc, char *argv[])
+void PerformAction(int Action, TNetDev *Dev, TNet *Conf)
 {
-    ListNode *Networks;
     char *Tempstr=NULL;
-    TNet *Conf, *Net;
-    int Action;
-    TNetDev *Dev;
+		TNet *Net;
 
-    StdIO=STREAMFromDualFD(0, 1);
-    SettingsInit();
-    CommandsInit();
-
-    Interfaces=ListCreate();
-    NetDevLoadInterfaces(Interfaces);
-
-    Conf=NetCreate();
-    Action=ParseCommandLine(argc, argv, Conf);
-
-    Dev=NetDevSelectInterface(Interfaces, Conf->Interface);
-    if (Dev)
-    {
         switch (Action)
         {
         case ACT_ADD:
@@ -137,6 +119,13 @@ int main(int argc, char *argv[])
             printf("Configure IPv4: ip:%s netmask:%s gw:%s dns:%s\n", Conf->Address, Conf->Netmask, Conf->Gateway, Conf->DNSServer);
             NetSetupInterface(Dev, Conf->Address, Conf->Netmask, Conf->Gateway, Conf->DNSServer);
             if (Conf->Flags & NET_STORE) SettingsSaveNet(Conf);
+						PerformAction(ACT_STATUS, Dev, Conf);
+            break;
+
+        case ACT_STATUS:
+            Net=(TNet *) calloc(1, sizeof(TNet));
+            InteractiveHeaders(Dev, Net, StdIO);
+            NetDestroy(Net);
             break;
 
         case ACT_QRCODE:
@@ -169,18 +158,39 @@ int main(int argc, char *argv[])
             break;
 
         case ACT_VERSION:
-						printf("term_wifi %s\n", VERSION);
+            printf("term_wifi %s\n", VERSION);
             break;
 
         case ACT_HELP:
             DisplayHelp();
             break;
+				}
+
+Destroy(Tempstr);
+}
 
 
-        }
-    }
 
-    Destroy(Tempstr);
+int main(int argc, char *argv[])
+{
+    ListNode *Networks;
+    TNet *Conf;
+    int Action;
+    TNetDev *Dev;
+
+    StdIO=STREAMFromDualFD(0, 1);
+    SettingsInit();
+    CommandsInit();
+
+    Interfaces=ListCreate();
+    NetDevLoadInterfaces(Interfaces);
+
+    Conf=NetCreate();
+    Action=ParseCommandLine(argc, argv, Conf);
+
+    Dev=NetDevSelectInterface(Interfaces, Conf->Interface);
+    if (Dev) PerformAction(Action, Dev, Conf);
+
 
     return(0);
 }
