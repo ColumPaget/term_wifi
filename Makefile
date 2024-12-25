@@ -1,4 +1,4 @@
-VERSION=3.1
+VERSION=3.2
 CC=gcc
 LIBS= -lcrypto -lssl -lUseful-5  
 FLAGS=-g -O2 -DVERSION=\"$(VERSION)\"

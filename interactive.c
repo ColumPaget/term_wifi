@@ -176,6 +176,10 @@ int InteractiveQueryNetConfig(TNetDev *Dev, TNet *Net)
 
     TerminalCursorMove(StdIO, 0, 2);
 
+		//don't timeout reading from StdIO, wait forever for user to
+		//enter data as appropriate
+		STREAMSetTimeout(StdIO, 0);
+
     if (Net->Flags & NET_ENCRYPTED)
     {
 
@@ -231,7 +235,6 @@ int InteractiveQueryNetConfig(TNetDev *Dev, TNet *Net)
 
     if (StrValid(Net->Address))
     {
-
         Net->Netmask=TerminalReadPrompt(Net->Netmask, "Netmask: ", 0, StdIO);
         if (Net->Netmask==NULL)
         {
@@ -337,6 +340,8 @@ void InteractiveChangeInterface(TNetDev *Dev)
 
     TerminalCursorMove(StdIO, 0, 6);
 
+		//don't timeout, wait for user input
+		STREAMSetTimeout(StdIO, 0);
     Options=ListCreate();
     Curr=ListGetNext(Interfaces);
     while (Curr)
@@ -390,9 +395,13 @@ void Interactive(TNetDev *iDev)
     InteractiveWifiUpdate(Dev, StdIO, Menu, wid, len);
     Menu->MenuAttribs=CopyStr(Menu->MenuAttribs, "~N~w");
 
-    STREAMSetTimeout(StdIO, 200);
     while (NotExit)
     {
+				//if we're in this loop, then we refresh every 2 seconds
+				//other screens launched from here will set Timeout to 0
+				//so we need to set back to 200 here
+    		STREAMSetTimeout(StdIO, 200);
+
         Tempstr=FormatStr(Tempstr, "~B~w %d wireless networks found", ListSize(Menu->Options));
         InteractiveTitleBar(Dev, Tempstr);
         TerminalMenuDraw(Menu);
@@ -461,7 +470,6 @@ void Interactive(TNetDev *iDev)
                 InteractiveJoinNetwork(Dev, Net, StdIO);
                 InteractiveWifiNetworksReload(Menu, InteractiveNetList);
                 TerminalMenuDraw(Menu);
-
             }
             break;
         }
