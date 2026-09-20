@@ -2,42 +2,63 @@
 
 TSettings Settings;
 
+
+char *SettingsRenderPath(char *RetStr, const char *iPath)
+{
+    if (strncmp(iPath, "~/", 2)==0) RetStr=MCopyStr(RetStr, GetCurrUserHomeDir(), iPath +1, NULL);
+		else RetStr=CopyStr(RetStr, iPath);
+
+return(RetStr);
+}
+
 void SettingsInit()
 {
     memset(&Settings, 0, sizeof(Settings));
 
     Settings.PidsDir=CopyStr(Settings.PidsDir, DEFAULT_PIDS_DIR);
     Settings.ConfigFile=CopyStr(Settings.ConfigFile, DEFAULT_CONFIG_FILE);
+    Settings.SyncImportLog=CopyStr(Settings.SyncImportLog, DEFAULT_IMPORT_LOG);
     Settings.ImageViewer=CopyStr(Settings.ImageViewer, "imlib2_view,fim,feh,display,xv,phototonic,qimageviewer,pix,sxiv,qimgv,qview,nomacs,geeqie,ristretto,mirage,fotowall,links -g,convert,img2sixel -e");
 }
 
 
-void SettingsPostProcess()
-{
-    char *Tempstr=NULL;
 
-    if (strncmp(Settings.ConfigFile, "~/", 2)==0)
+
+
+TNet *SettingsGetNet(ListNode *Nets, const char *Essid, const char *Match)
+{
+    TNet *Net=NULL;
+    ListNode *Node;
+
+    if ( (! StrValid(Match)) || (strcasecmp(Match, Essid)==0) )
     {
-        Tempstr=MCopyStr(Tempstr, GetCurrUserHomeDir(), Settings.ConfigFile +1, NULL);
-        Settings.ConfigFile=CopyStr(Settings.ConfigFile, Tempstr);
+        Node=ListFindNamedItem(Nets, Essid);
+        if (Node) Net=(TNet *) Node->Item;
+        else
+        {
+            Net=NetCreate();
+            Net->ESSID=CopyStr(Net->ESSID, Essid);
+            Net->AccessPoint=CopyStr(Net->AccessPoint, "");
+            ListAddNamedItem(Nets, Net->ESSID, Net);
+        }
     }
 
-    Destroy(Tempstr);
+    return(Net);
 }
 
 
-
-ListNode *SettingsLoadNets(const char *Match)
+int SettingsAddNets(ListNode *Nets, const char *Path, const char *Match)
 {
     STREAM *S;
     char *Tempstr=NULL, *Token=NULL;
     const char *ptr;
-    ListNode *Nets=NULL, *Curr;
+    ListNode *Curr;
     TNet *Net;
 
-    Nets=ListCreate();
+		Tempstr=SettingsRenderPath(Tempstr, Path);
+    S=STREAMOpen(Tempstr, "r");
+    if (! S) return(FALSE);
 
-    S=STREAMOpen(Settings.ConfigFile, "r");
     if (S)
     {
         Tempstr=STREAMReadLine(Tempstr, S);
@@ -46,33 +67,24 @@ ListNode *SettingsLoadNets(const char *Match)
             StripTrailingWhitespace(Tempstr);
 
             ptr=GetToken(Tempstr, "\\S", &Token, 0);
-            if (strcasecmp(Token, "essid")==0)
-            {
-                Net=NULL;
-
-                if ( (! StrValid(Match)) || (strcasecmp(Match, ptr)==0) )
-                {
-                    Net=NetCreate();
-                    Net->ESSID=CopyStr(Net->ESSID, ptr);
-                    Net->AccessPoint=CopyStr(Net->AccessPoint, "");
-                    ListAddNamedItem(Nets, Net->ESSID, Net);
-                }
-            }
+            if (strcasecmp(Token, "essid")==0) Net=SettingsGetNet(Nets, ptr, Match);
             else if (Net)
             {
-                if (strcmp(Token, "wpa1")==0) Net->Flags |= NET_WPA1;
-                if (strcmp(Token, "wpa2")==0) Net->Flags |= NET_WPA2;
-                if (strcmp(Token, "wep")==0) Net->Flags |= NET_WEP;
-                if (strcmp(Token, "rsn")==0) Net->Flags |= NET_RSN;
-                if (strcmp(Token, "user")==0) Net->UserID=CopyStr(Net->UserID, ptr);
-                if (strcmp(Token, "key")==0) Net->Key=CopyStr(Net->Key, ptr);
-                if (strcmp(Token, "address")==0) Net->Address=CopyStr(Net->Address, ptr);
-                if (strcmp(Token, "netmask")==0) Net->Netmask=CopyStr(Net->Netmask, ptr);
-                if (strcmp(Token, "gateway")==0) Net->Gateway=CopyStr(Net->Gateway, ptr);
-                if (strcmp(Token, "country")==0) Net->CountryCode=CopyStr(Net->CountryCode, ptr);
-                if (strcmp(Token, "dns")==0) Net->DNSServer=CopyStr(Net->DNSServer, ptr);
-                if (strcmp(Token, "accesspoint")==0) Net->AccessPoint=CopyStr(Net->AccessPoint, ptr);
-                if (strcmp(Token, "channel")==0) Net->Channel=atoi(ptr);
+                if (strcasecmp(Token, "wpa1")==0) Net->Flags |= NET_WPA1;
+                else if (strcasecmp(Token, "wpa2")==0) Net->Flags |= NET_WPA2;
+                else if (strcasecmp(Token, "wep")==0) Net->Flags |= NET_WEP;
+                else if (strcasecmp(Token, "rsn")==0) Net->Flags |= NET_RSN;
+                else if (strcasecmp(Token, "user")==0) Net->UserID=CopyStr(Net->UserID, ptr);
+                else if (strcasecmp(Token, "key")==0) Net->Key=CopyStr(Net->Key, ptr);
+                else if (strcasecmp(Token, "address")==0) Net->Address=CopyStr(Net->Address, ptr);
+                else if (strcasecmp(Token, "netmask")==0) Net->Netmask=CopyStr(Net->Netmask, ptr);
+                else if (strcasecmp(Token, "gateway")==0) Net->Gateway=CopyStr(Net->Gateway, ptr);
+                else if (strcasecmp(Token, "country")==0) Net->CountryCode=CopyStr(Net->CountryCode, ptr);
+                else if (strcasecmp(Token, "dns")==0) Net->DNSServer=CopyStr(Net->DNSServer, ptr);
+                else if (strcasecmp(Token, "accesspoint")==0) Net->AccessPoint=CopyStr(Net->AccessPoint, ptr);
+                else if (strcasecmp(Token, "title")==0) Net->Title=CopyStr(Net->Title, ptr);
+                else if (strcasecmp(Token, "added")==0) Net->DateAdded=CopyStr(Net->DateAdded, ptr);
+                else if (strcasecmp(Token, "channel")==0) Net->Channel=atoi(ptr);
             }
 
             Tempstr=STREAMReadLine(Tempstr, S);
@@ -92,6 +104,27 @@ ListNode *SettingsLoadNets(const char *Match)
     Destroy(Tempstr);
     Destroy(Token);
 
+    return(TRUE);
+}
+
+
+
+ListNode *SettingsLoadNets(const char *Path, const char *Match)
+{
+    ListNode *Nets=NULL;
+    char *Token=NULL;
+    const char *ptr;
+
+    Nets=ListCreate();
+		ptr=GetToken(Path, ":", &Token, 0);
+		while (ptr)
+		{
+    SettingsAddNets(Nets, Token, Match);
+		ptr=GetToken(ptr, ":", &Token, 0);
+		}
+
+		Destroy(Token);
+
     return(Nets);
 }
 
@@ -99,27 +132,41 @@ ListNode *SettingsLoadNets(const char *Match)
 
 
 
-void SettingsSaveNets(ListNode *List)
+int SettingsWriteNets(const char *Path, ListNode *List)
 {
     ListNode *Curr;
     char *Tempstr=NULL;
     TNet *Net;
     STREAM *S;
+    int RetVal=FALSE;
 
-    S=STREAMOpen(Settings.ConfigFile, "w");
+
+		Tempstr=SettingsRenderPath(Tempstr, Path);
+		MakeDirPath(Tempstr, 0700);
+    S=STREAMOpen(Tempstr, "w");
     if (S)
     {
+				RetVal=TRUE;
         Curr=ListGetNext(List);
         while (Curr)
         {
             Net=(TNet *) Curr->Item;
+
+            //essid MUST be the first thing in the entry
             Tempstr=MCopyStr(Tempstr, "essid ", Net->ESSID, "\n", NULL);
             STREAMWriteLine(Tempstr, S);
+
 
             if (Net->Flags & NET_RSN) STREAMWriteLine("rsn\n", S);
             if (Net->Flags & NET_WPA2) STREAMWriteLine("wpa2\n", S);
             if (Net->Flags & NET_WPA1) STREAMWriteLine("wpa1\n", S);
             if (Net->Flags & NET_WEP) STREAMWriteLine("wep\n", S);
+
+            if (StrValid(Net->Title))
+            {
+                Tempstr=MCopyStr(Tempstr, "title ", Net->Title, "\n", NULL);
+                STREAMWriteLine(Tempstr, S);
+            }
 
             if (StrValid(Net->CountryCode))
             {
@@ -169,6 +216,10 @@ void SettingsSaveNets(ListNode *List)
                 STREAMWriteLine(Tempstr, S);
             }
 
+            if (StrValid(Net->DateAdded)) Tempstr=MCopyStr(Tempstr, "added ", Net->DateAdded, "\n", NULL);
+            else Tempstr=MCopyStr(Tempstr, "added ", GetDateStr("%Y-%m-%dT%H:%M:%S", NULL),  "\n", NULL);
+            STREAMWriteLine(Tempstr, S);
+
             STREAMWriteLine("\n", S);
 
             Curr=ListGetNext(Curr);
@@ -177,8 +228,28 @@ void SettingsSaveNets(ListNode *List)
     }
     Destroy(Tempstr);
 
+return(RetVal);
 }
 
+
+int SettingsSaveNets(const char *Path, ListNode *List)
+{
+char *Token=NULL;
+const char *ptr;
+int RetVal=TRUE;
+
+ptr=GetToken(Path, ":", &Token, 0);
+while (ptr)
+{
+RetVal=SettingsWriteNets(Token, List);
+if (RetVal) break;
+ptr=GetToken(ptr, ":", &Token, 0);
+}
+
+Destroy(Token);
+
+return(RetVal);
+}
 
 
 void SettingsConfigureNet(TNet *Net)
@@ -186,7 +257,7 @@ void SettingsConfigureNet(TNet *Net)
     ListNode *Nets, *Curr;
     TNet *Found=NULL, *tmpNet;
 
-    Nets=SettingsLoadNets(NULL);
+    Nets=SettingsLoadNets(Settings.ConfigFile, NULL);
 
     Curr=ListGetNext(Nets);
     while (Curr)
@@ -225,7 +296,7 @@ void SettingsSaveNet(TNet *Net)
     ListNode *Nets;
     TNet *tmpNet;
 
-    Nets=SettingsLoadNets(NULL);
+    Nets=SettingsLoadNets(Settings.ConfigFile, NULL);
     tmpNet=NetCreate();
     tmpNet->ESSID=CopyStr(tmpNet->ESSID, Net->ESSID);
     tmpNet->UserID=CopyStr(tmpNet->UserID, Net->UserID);
@@ -238,7 +309,7 @@ void SettingsSaveNet(TNet *Net)
     tmpNet->CountryCode=CopyStr(tmpNet->CountryCode, Net->CountryCode);
     ListAddNamedItem(Nets, tmpNet->ESSID, tmpNet);
 
-    SettingsSaveNets(Nets);
+    SettingsSaveNets(Settings.ConfigFile, Nets);
 
     ListDestroy(Nets, NetDestroy);
 }
@@ -248,13 +319,13 @@ void SettingsForgetNet(const char *ESSID)
 {
     ListNode *Nets, *Node;
 
-    Nets=SettingsLoadNets(NULL);
+    Nets=SettingsLoadNets(Settings.ConfigFile, NULL);
     Node=ListFindNamedItem(Nets, ESSID);
     if (Node)
     {
         NetDestroy((TNet *) Node->Item);
         ListDeleteNode(Node);
-        SettingsSaveNets(Nets);
+        SettingsSaveNets(Settings.ConfigFile, Nets);
     }
 
 }

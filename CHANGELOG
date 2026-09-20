@@ -1,3 +1,9 @@
+v4.0 (2026-09-20)
+================
+  * added 'sync' system for importing and exporting list of nets, allowing synchronization between hosts
+  * moved config file to .config/term_wifi/term_wifi.conf
+  * added support for multiple config files
+
 v3.2 (2024-12-25)
 =================
   * fix issue with 'add network' screen timing out before user input done

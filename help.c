@@ -16,19 +16,37 @@ void DisplayHelp()
     printf("  term_wifi qrcode <essid>                                            display qr code for saved network with essid '<essid>'\n");
     printf("  term_wifi qrcode <essid> -viewer <list>                             display qr code for saved network with essid '<essid>' using first viewer program found in comma-separated list '<list>'\n");
     printf("  term_wifi qrcode <essid> -o <path>                                  write qr code for network '<essid>' to PNG file at <path>\n");
+    printf("  term_wifi import <path>                                             import file at <path> which contains a list of networks\n");
+    printf("  term_wifi export <path>                                             export known networks to file <path>\n");
     printf("  term_wifi -?                                                        this help\n");
     printf("  term_wifi -h                                                        this help\n");
     printf("  term_wifi -help                                                     this help\n");
     printf("  term_wifi --help                                                    this help\n");
+    printf("  term_wifi -version                                                  output program version\n");
+    printf("  term_wifi -version                                                  output program version\n");
     printf("\n");
     printf("options that apply to connect/interactive mode\n");
     printf("  -i <interface>                                                      interface to use\n");
     printf("  -ap <access point mac address>                                      access point to join (if many for same essid)\n");
     printf("  -k <key>                                                            authentication key for given essid/network)\n");
+    printf("  -w <path>                                                           path to the control sock of a wpa_supplicant running as a daemon\n");
 
     printf("\n");
     printf("term-wifi requires iwconfig or iw to be installed, wpa_supplicant for WPA networks, dhcpcd for dhcp support and ifconfig and route for network setup\n");
     printf("if term-wifi is not run as root, then it will try to use sudo, or if that's not installed, su, to run network commands with root permissions\n");
     printf("qr-code export requires qrencode utility to be installed, and also an image viewer\n");
 }
+
+
+/*
+        else if (strcmp(ptr, "-o")==0) Settings.OutputPath=CopyStr(Settings.OutputPath, CommandLineNext(CL));
+        else if (strcmp(ptr, "-viewer")==0) Settings.ImageViewer=CopyStr(Settings.ImageViewer, CommandLineNext(CL));
+        else if (strcmp(ptr, "-view")==0)
+        {
+            ptr=CommandLineNext(CL);
+            if (strcasecmp(ptr, "sixel")==0) Settings.ImageViewer=CopyStr(Settings.ImageViewer, "img2sixel -e,convert");
+            else Settings.ImageViewer=CopyStr(Settings.ImageViewer, CommandLineNext(CL));
+        }
+*/
+
 

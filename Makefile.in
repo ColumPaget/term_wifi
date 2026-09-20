@@ -1,4 +1,4 @@
-VERSION=3.2
+VERSION=4.0
 CC=@CC@
 LIBS=@LDFLAGS@ @LIBS@ @LIBUSEFUL_BUNDLED@
 FLAGS=@CFLAGS@ -DVERSION=\"$(VERSION)\"
@@ -8,13 +8,13 @@ BINDIR=@bindir@
 man_prefix=@man_prefix@
 MANDIR=@mandir@
 
-OBJ=common.o net.o netdev.o runcommand.o iw.o wireless_tools.o wpa_supplicant.o wifi.o interactive.o settings.o qrcode.o command_line.o help.o
+OBJ=common.o net.o netdev.o runcommand.o iw.o wireless_tools.o wpa_supplicant.o wifi.o interactive.o settings.o sync.o qrcode.o command_line.o help.o
 
 all: $(OBJ) @LIBUSEFUL_BUNDLED@
 	$(CC) $(FLAGS)  -oterm_wifi $(OBJ) main.c $(LIBS)
 
-libUseful-4/libUseful.a:
-	$(MAKE) -C libUseful-4
+libUseful-bundled/libUseful.a:
+	$(MAKE) -C libUseful-bundled
 
 common.o: common.h common.c common.h
 	$(CC) $(FLAGS)  -c common.c
@@ -37,6 +37,9 @@ netdev.o: netdev.h netdev.c common.h
 wifi.o: wifi.h wifi.c common.h
 	$(CC) $(FLAGS)  -c wifi.c
 
+sync.o: sync.h sync.c common.h
+	$(CC) $(FLAGS)  -c sync.c
+
 iw.o: iw.h iw.c common.h
 	$(CC) $(FLAGS)  -c iw.c
 
@@ -57,7 +60,7 @@ command_line.o: command_line.h command_line.c common.h
 
 
 clean:
-	rm term_wifi *.o libUseful-4/*.o libUseful-4/*.a libUseful-4/*.so *.orig
+	rm term_wifi *.o */*.o */*.a */*.so *.orig
 
 install:
 	mkdir -p $(BINDIR)

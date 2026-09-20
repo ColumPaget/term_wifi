@@ -5,7 +5,7 @@
 #ifdef HAVE_LIBUSEFUL5_LIBUSEFUL_H
 #include "libUseful-5/libUseful.h"
 #else
-#include "libUseful-4/libUseful.h"
+#include "libUseful-bundled/libUseful.h"
 #endif
 
 
@@ -35,20 +35,23 @@ char *Driver;
 
 typedef struct
 {
+int Flags;
+int Channel;
+char *ESSID;
+char *Title;
 char *Interface;
 char *MacAddress;
 char *Address;
 char *Netmask;
 char *Gateway;
 char *DNSServer;
-char *ESSID;
 char *AccessPoint;
 char *CountryCode;
-int Flags;
-int Channel;
 char *BitRates;
 char *UserID;
 char *Key;
+char *Path;
+char *DateAdded;
 float Quality;
 float dBm;
 } TNet;

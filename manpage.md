@@ -34,20 +34,22 @@ qr-code export requires qrencode utility to be installed, and also an image view
   term_wifi connect <essid>                                           join configured network with default interface
   term_wifi qrcode <essid>                                            display qr code for saved network with essid '<essid>'
   term_wifi qrcode <essid> -viewer <list>                             display qr code for saved network with essid '<essid>' using first viewer program found in comma-separated list '<list>'
+  term_wifi qrcode <essid> -viewer "sixel"                            display qr code using terminal's sixel support
   term_wifi qrcode <essid> -o <path>                                  write qr code for network '<essid>' to PNG file at <path>
-  term_wifi version                                                   output program version
-  term_wifi help                                                      this help
+  term_wifi import <path>                                             import file at <path> which contains a list of networks
+  term_wifi export <path>                                             export known networks to file <path>
   term_wifi -?                                                        this help
   term_wifi -h                                                        this help
   term_wifi -help                                                     this help
   term_wifi --help                                                    this help
   term_wifi -version                                                  output program version
-  term_wifi --version                                                 output program version
+  term_wifi -version                                                  output program version
 
 options that apply to connect/interactive mode
   -i <interface>                                                      interface to use
   -ap <access point mac address>                                      access point to join (if many for same essid)
   -k <key>                                                            authentication key for given essid/network)
+  -w <path>                                                           path to the control sock of a wpa_supplicant running as a daemon
 ```
 
 you can use `-i <interface>` to specify and interface to use for the 'connect', 'scan' and tui commands.
@@ -141,4 +143,8 @@ If no image viewers are found, there are two options at the end of this list tha
 Finally, if nothing matching is found, the ultimate fallback is to use qrencodes 'ANSI256' display message to create a giant QR code with ANSI graphics.
 
 
+# IMPORT/EXPORT
 
+the 'import' and 'export' commands allow reading network info from, and writing it to, external files. This is intended to be used in a simple 'synchronization' system using rsync or other such file-transfer programs. 
+
+Note that the export command writes it's output file with FULLY OPEN PERMISSONS. This is to allow file transfer by users other than the root user. If you wish to keep the file, which will contain passwords for know wifi networks, private then write it to a directory that has appropriate private permissions. 

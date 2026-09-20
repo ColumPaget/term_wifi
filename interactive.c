@@ -104,13 +104,37 @@ static void InteractiveBottomBar(STREAM *StdIO, int wid, int len)
 }
 
 
+TNet *GetNetDetails(TNet *Net, ListNode *ConfiguredNets)
+{
+    ListNode *Node;
+    TNet *Found;
+
+    if (InteractiveDisplayMode == DISPLAY_OPEN_NETS)
+    {
+        if (Net->Flags & NET_ENCRYPTED) return(NULL);
+    }
+
+    Node=ListFindNamedItem(ConfiguredNets, Net->ESSID);
+    if (Node)
+    {
+        Found=(TNet *) Node->Item;
+        Net->Title=CopyStr(Net->Title, Found->Title);
+        Net->Key=CopyStr(Net->Key, Found->Key);
+    }
+    else if (InteractiveDisplayMode == DISPLAY_KNOWN_NETS) return(NULL);
+
+    return(Net);
+}
+
+
+
 static void InteractiveWifiNetworksReload(TERMMENU *Menu, ListNode *Networks)
 {
     ListNode *Curr;
     TNet *Net;
 
     if (ConfiguredNets) ListDestroy(ConfiguredNets, NetDestroy);
-    ConfiguredNets=SettingsLoadNets(NULL);
+    ConfiguredNets=SettingsLoadNets(Settings.ConfigFile, NULL);
 
     ListClear(Menu->Options, NULL);
 
@@ -120,15 +144,10 @@ static void InteractiveWifiNetworksReload(TERMMENU *Menu, ListNode *Networks)
     while (Curr)
     {
         Net=(TNet *) Curr->Item;
-        if (InteractiveDisplayMode == DISPLAY_KNOWN_NETS)
-        {
-            if (ListFindNamedItem(ConfiguredNets, Net->ESSID)) ListAddItem(Menu->Options, Net);
-        }
-        else if (InteractiveDisplayMode == DISPLAY_OPEN_NETS)
-        {
-            if (! (Net->Flags & NET_ENCRYPTED)) ListAddItem(Menu->Options, Net);
-        }
-        else ListAddItem(Menu->Options, Net);
+
+        Net=GetNetDetails(Net, ConfiguredNets);
+        if (Net) ListAddItem(Menu->Options, Net);
+
         Curr=ListGetNext(Curr);
     }
 
@@ -176,9 +195,9 @@ int InteractiveQueryNetConfig(TNetDev *Dev, TNet *Net)
 
     TerminalCursorMove(StdIO, 0, 2);
 
-		//don't timeout reading from StdIO, wait forever for user to
-		//enter data as appropriate
-		STREAMSetTimeout(StdIO, 0);
+    //don't timeout reading from StdIO, wait forever for user to
+    //enter data as appropriate
+    STREAMSetTimeout(StdIO, 0);
 
     if (Net->Flags & NET_ENCRYPTED)
     {
@@ -272,6 +291,8 @@ int InteractiveQueryNetConfig(TNetDev *Dev, TNet *Net)
 
     TerminalPutStr("\n", StdIO);
     TerminalPutStr("\n", StdIO);
+
+
     Tempstr=TerminalReadPrompt(Tempstr, "Save for future use? Y/n:  ", 0, StdIO);
     if (Tempstr==NULL)
     {
@@ -310,7 +331,7 @@ void InteractiveJoinNetwork(TNetDev *Dev, TNet *Conf, STREAM *Out)
         WifiSetup(Dev, Conf);
         usleep(250000);
 
-    		TerminalCursorMove(Out, 0, 2);
+        TerminalCursorMove(Out, 0, 2);
         InteractiveHeaders(Dev, Net, Out);
         if (Net->Flags & NET_ASSOCIATED)
         {
@@ -340,8 +361,8 @@ void InteractiveChangeInterface(TNetDev *Dev)
 
     TerminalCursorMove(StdIO, 0, 6);
 
-		//don't timeout, wait for user input
-		STREAMSetTimeout(StdIO, 0);
+    //don't timeout, wait for user input
+    STREAMSetTimeout(StdIO, 0);
     Options=ListCreate();
     Curr=ListGetNext(Interfaces);
     while (Curr)
@@ -384,7 +405,7 @@ void Interactive(TNetDev *iDev)
 
     Dev=NetDevClone(iDev);
     if (ConfiguredNets) ListDestroy(ConfiguredNets, NetDestroy);
-    ConfiguredNets=SettingsLoadNets(NULL);
+    ConfiguredNets=SettingsLoadNets(Settings.ConfigFile, NULL);
 
     TerminalInit(StdIO, TERM_RAWKEYS | TERM_SAVEATTRIBS);
 
@@ -393,14 +414,14 @@ void Interactive(TNetDev *iDev)
 
     Menu=TerminalMenuCreate(StdIO, 2, 7, wid - 4, len - 11);
     InteractiveWifiUpdate(Dev, StdIO, Menu, wid, len);
-    Menu->MenuAttribs=CopyStr(Menu->MenuAttribs, "~N~w");
+    Menu->Attribs=CopyStr(Menu->Attribs, "~N~w");
 
     while (NotExit)
     {
-				//if we're in this loop, then we refresh every 2 seconds
-				//other screens launched from here will set Timeout to 0
-				//so we need to set back to 200 here
-    		STREAMSetTimeout(StdIO, 200);
+        //if we're in this loop, then we refresh every 2 seconds
+        //other screens launched from here will set Timeout to 0
+        //so we need to set back to 200 here
+        STREAMSetTimeout(StdIO, 200);
 
         Tempstr=FormatStr(Tempstr, "~B~w %d wireless networks found", ListSize(Menu->Options));
         InteractiveTitleBar(Dev, Tempstr);

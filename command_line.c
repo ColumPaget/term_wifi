@@ -12,6 +12,8 @@ int ParseCommandLine(int argc, char *argv[], TNet *Conf)
     ptr=CommandLineFirst(CL);
     if (StrValid(ptr))
     {
+        while (*ptr == '-') ptr++;
+
         if (strcmp(ptr, "list")==0) Act=ACT_LIST;
         else if (strcmp(ptr, "interfaces")==0) Act=ACT_IFACE_LIST;
         else if (strcmp(ptr, "scan")==0)
@@ -76,7 +78,17 @@ int ParseCommandLine(int argc, char *argv[], TNet *Conf)
             Act=ACT_QRCODE;
             Conf->ESSID=CopyStr(Conf->ESSID, CommandLineNext(CL));
         }
-				else if (strcmp(ptr, "status")==0) Act=ACT_STATUS;
+        else if (strcmp(ptr, "import")==0) 
+        {
+            Act=ACT_IMPORT;
+            Conf->Path=CopyStr(Conf->Path, CommandLineNext(CL));
+        }
+        else if (strcmp(ptr, "export")==0)
+        {
+            Act=ACT_EXPORT;
+            Conf->Path=CopyStr(Conf->Path, CommandLineNext(CL));
+        }
+        else if (strcmp(ptr, "status")==0) Act=ACT_STATUS;
         else if (strcmp(ptr, "help")==0) Act=ACT_HELP;
         else if (strcmp(ptr, "version")==0) Act=ACT_VERSION;
     }

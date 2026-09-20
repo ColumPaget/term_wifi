@@ -6,6 +6,7 @@
 #include "command_line.h"
 #include "interactive.h"
 #include "qrcode.h"
+#include "sync.h"
 #include "help.h"
 
 
@@ -46,12 +47,12 @@ void ListNetworks()
     TNet *Net;
 
     printf("Configured networks: \n");
-    Networks=SettingsLoadNets(NULL);
+    Networks=SettingsLoadNets(Settings.ConfigFile, NULL);
     Curr=ListGetNext(Networks);
     while (Curr)
     {
         Net=(TNet *) Curr->Item;
-        printf("% 15s ip:%s netmask:%s gateway:%s dns:%s\n", Net->ESSID, Net->Address, Net->Netmask, Net->Gateway, Net->DNSServer);
+        printf("% 30s ip:%s  netmask:%s  gateway:%s  dns:%s\n", Net->ESSID, Net->Address, Net->Netmask, Net->Gateway, Net->DNSServer);
         Curr=ListGetNext(Curr);
     }
 
@@ -64,8 +65,8 @@ void ScanForNetworks(TNetDev *Dev)
     char *Tempstr=NULL, *Output=NULL;
     TNet *Net;
 
-		//globally visible, used by OutputFormatNet
-    ConfiguredNets=SettingsLoadNets(NULL);
+    //globally visible, used by OutputFormatNet
+    ConfiguredNets=SettingsLoadNets(Settings.ConfigFile, NULL);
     Networks=WifiGetNetworks(Dev);
     Curr=ListGetNext(Networks);
     while (Curr)
@@ -89,84 +90,103 @@ void ScanForNetworks(TNetDev *Dev)
 void PerformAction(int Action, TNetDev *Dev, TNet *Conf)
 {
     char *Tempstr=NULL;
-		TNet *Net;
+    TNet *Net;
 
-        switch (Action)
+    switch (Action)
+    {
+    case ACT_ADD:
+        if (! StrValid(Conf->Key)) Conf->Key=TerminalReadPrompt(Conf->Key, "Key/password: ", 0, StdIO);
+        SettingsConfigureNet(Conf);
+        SettingsSaveNet(Conf);
+        break;
+
+    case ACT_JOIN:
+				if (Dev)
+				{
+        SettingsConfigureNet(Conf);
+        if (Dev->Flags & DEV_WIFI)
         {
-        case ACT_ADD:
             if (! StrValid(Conf->Key)) Conf->Key=TerminalReadPrompt(Conf->Key, "Key/password: ", 0, StdIO);
-            SettingsConfigureNet(Conf);
-            SettingsSaveNet(Conf);
-            break;
+            printf("Configure wifi: dev:%s essid:%s\n", Conf->Interface, Conf->ESSID);
+            WifiSetup(Dev, Conf);
+        }
 
-        case ACT_JOIN:
-            SettingsConfigureNet(Conf);
-            if (Dev->Flags & DEV_WIFI)
-            {
-                if (! StrValid(Conf->Key)) Conf->Key=TerminalReadPrompt(Conf->Key, "Key/password: ", 0, StdIO);
-                printf("Configure wifi: dev:%s essid:%s\n", Conf->Interface, Conf->ESSID);
-                WifiSetup(Dev, Conf);
-            }
+        Net=(TNet *) calloc(1, sizeof(TNet));
+        while (1)
+        {
+            WifiGetStatus(Dev, Net);
+            if (Net->Flags & NET_ASSOCIATED) break;
+        }
+        NetDestroy(Net);
 
-            Net=(TNet *) calloc(1, sizeof(TNet));
-            while (1)
-            {
-                WifiGetStatus(Dev, Net);
-                if (Net->Flags & NET_ASSOCIATED) break;
-            }
-            NetDestroy(Net);
-
-            printf("Configure IPv4: ip:%s netmask:%s gw:%s dns:%s\n", Conf->Address, Conf->Netmask, Conf->Gateway, Conf->DNSServer);
-            NetSetupInterface(Dev, Conf->Address, Conf->Netmask, Conf->Gateway, Conf->DNSServer);
-            if (Conf->Flags & NET_STORE) SettingsSaveNet(Conf);
-						PerformAction(ACT_STATUS, Dev, Conf);
-            break;
-
-        case ACT_STATUS:
-            Net=(TNet *) calloc(1, sizeof(TNet));
-            InteractiveHeaders(Dev, Net, StdIO);
-            NetDestroy(Net);
-            break;
-
-        case ACT_QRCODE:
-            SettingsConfigureNet(Conf);
-            DisplayQRCode(Conf);
-            break;
-
-        case ACT_FORGET:
-            SettingsForgetNet(Conf->ESSID);
-            break;
-
-        case ACT_LIST:
-            ListNetworks();
-            break;
-
-        case ACT_SCAN:
-            ScanForNetworks(Dev);
-            break;
-
-        case ACT_LEAVE:
-            NetDown(Dev);
-            break;
-
-        case ACT_INTERACTIVE:
-            Interactive(Dev);
-            break;
-
-        case ACT_IFACE_LIST:
-            ListInterfaces();
-            break;
-
-        case ACT_VERSION:
-            printf("term_wifi %s\n", VERSION);
-            break;
-
-        case ACT_HELP:
-            DisplayHelp();
-            break;
+        printf("Configure IPv4: ip:%s netmask:%s gw:%s dns:%s\n", Conf->Address, Conf->Netmask, Conf->Gateway, Conf->DNSServer);
+        NetSetupInterface(Dev, Conf->Address, Conf->Netmask, Conf->Gateway, Conf->DNSServer);
+        if (Conf->Flags & NET_STORE) SettingsSaveNet(Conf);
+        PerformAction(ACT_STATUS, Dev, Conf);
 				}
+				else printf("ERROR: can't find wifi device\n");
+        break;
 
-Destroy(Tempstr);
+    case ACT_STATUS:
+				if (Dev)
+				{
+        Net=(TNet *) calloc(1, sizeof(TNet));
+        InteractiveHeaders(Dev, Net, StdIO);
+        NetDestroy(Net);
+				}
+				else printf("ERROR: can't find wifi device\n");
+        break;
+
+    case ACT_QRCODE:
+        SettingsConfigureNet(Conf);
+        DisplayQRCode(Conf);
+        break;
+
+    case ACT_FORGET:
+        SettingsForgetNet(Conf->ESSID);
+        break;
+
+    case ACT_LIST:
+        ListNetworks();
+        break;
+
+    case ACT_SCAN:
+        if (Dev) ScanForNetworks(Dev);
+				else printf("ERROR: can't find wifi device\n");
+        break;
+
+    case ACT_LEAVE:
+        if (Dev) NetDown(Dev);
+				else printf("ERROR: can't find wifi device\n");
+        break;
+
+    case ACT_INTERACTIVE:
+        if (Dev) Interactive(Dev);
+				else printf("ERROR: can't find wifi device\n");
+        break;
+
+    case ACT_IFACE_LIST:
+        ListInterfaces();
+        break;
+
+    case ACT_IMPORT:
+        Import(Conf->Path);
+        break;
+
+    case ACT_EXPORT:
+        Export(Conf->Path);
+        break;
+
+    case ACT_VERSION:
+        printf("term_wifi %s\n", VERSION);
+        break;
+
+    case ACT_HELP:
+        DisplayHelp();
+        break;
+    }
+
+    Destroy(Tempstr);
 }
 
 
@@ -189,7 +209,7 @@ int main(int argc, char *argv[])
     Action=ParseCommandLine(argc, argv, Conf);
 
     Dev=NetDevSelectInterface(Interfaces, Conf->Interface);
-    if (Dev) PerformAction(Action, Dev, Conf);
+    PerformAction(Action, Dev, Conf);
 
 
     return(0);

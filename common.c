@@ -77,18 +77,23 @@ int FrequencyToChannel(int freq)
 }
 
 
+
 TNet *NetCreate()
 {
     TNet *Net;
 
     Net=(TNet *) calloc(1, sizeof(TNet));
-    Net->Interface=CopyStr(Net->Interface, "");
+    Net->Title=CopyStr(Net->Title, "");
     Net->ESSID=CopyStr(Net->ESSID, "");
+    Net->Interface=CopyStr(Net->Interface, "");
+    Net->MacAddress=CopyStr(Net->MacAddress, "");
     Net->Address=CopyStr(Net->Address, "");
     Net->Netmask=CopyStr(Net->Netmask, "");
-    Net->Key=CopyStr(Net->Key, "");
-    Net->CountryCode=CopyStr(Net->CountryCode, "");
+    Net->Gateway=CopyStr(Net->Gateway, "");
+    Net->DNSServer=CopyStr(Net->DNSServer, "");
     Net->AccessPoint=CopyStr(Net->AccessPoint, "");
+    Net->CountryCode=CopyStr(Net->CountryCode, "");
+    Net->Key=CopyStr(Net->Key, "");
 
     return(Net);
 }
@@ -102,17 +107,23 @@ void NetDestroy(void *p_Net)
     Net=(TNet *) p_Net;
 
     Destroy(Net->Interface);
+    Destroy(Net->Title);
     Destroy(Net->ESSID);
     Destroy(Net->AccessPoint);
     Destroy(Net->Address);
+    Destroy(Net->MacAddress);
     Destroy(Net->Netmask);
     Destroy(Net->Gateway);
+    Destroy(Net->DNSServer);
     Destroy(Net->BitRates);
     Destroy(Net->CountryCode);
     Destroy(Net->UserID);
     Destroy(Net->Key);
+    Destroy(Net->Path);
+    Destroy(Net->DateAdded);
     free(Net);
 }
+
 
 
 void NetSetESSID(TNet *Net, const char *ESSID)
@@ -172,7 +183,8 @@ char *OutputFormatNet(char *Output, TNet *Net)
     Tempstr=FormatStr(Tempstr, "  %0.1fMb/s   chan:%03d  %s  ", Rate, Net->Channel, Net->AccessPoint);
     Output=CatStr(Output, Tempstr);
 
-    if (StrValid(Net->ESSID)) Output=MCatStr(Output, "~e", Net->ESSID, "~0 ", NULL);
+    if (StrValid(Net->Title)) Output=MCatStr(Output, "~e", Net->Title, "~0 ", NULL);
+    else if (StrValid(Net->ESSID)) Output=MCatStr(Output, "~e", Net->ESSID, "~0 ", NULL);
 
     Destroy(Tempstr);
 

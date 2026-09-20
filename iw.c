@@ -163,7 +163,7 @@ int IWGetStatus(TNetDev *Device, TNet *Net)
     Destroy(Output);
     Destroy(Tempstr);
 
-return(RetVal);
+    return(RetVal);
 }
 
 

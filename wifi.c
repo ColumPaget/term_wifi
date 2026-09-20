@@ -110,7 +110,7 @@ int WifiSetup(TNetDev *Dev, TNet *Conf)
     TNet *Net;
     int i, result=FALSE;
 
-    Configs=SettingsLoadNets(Conf->ESSID);
+    Configs=SettingsLoadNets(Settings.ConfigFile, Conf->ESSID);
     Networks=ListCreate();
 
     NetSetupInterface(Dev, "", "", "", "");
