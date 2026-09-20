@@ -1,6 +1,6 @@
 VERSION=4.0
 CC=gcc
-LIBS= -lcrypto -lssl -lUseful-5  
+LIBS=  libUseful-bundled/libUseful.a
 FLAGS=-g -O2 -DVERSION=\"$(VERSION)\"
 prefix=/usr/local
 exec_prefix=${prefix}
@@ -10,7 +10,7 @@ MANDIR=${prefix}/share/man
 
 OBJ=common.o net.o netdev.o runcommand.o iw.o wireless_tools.o wpa_supplicant.o wifi.o interactive.o settings.o sync.o qrcode.o command_line.o help.o
 
-all: $(OBJ) 
+all: $(OBJ) libUseful-bundled/libUseful.a
 	$(CC) $(FLAGS)  -oterm_wifi $(OBJ) main.c $(LIBS)
 
 libUseful-bundled/libUseful.a:

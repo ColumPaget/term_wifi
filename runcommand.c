@@ -63,6 +63,7 @@ char *RunCommand(char *RetStr, const char *Command, int Flags)
 
     if (Flags & RUNCMD_ROOT)
     {
+/*
         p_Path=GetVar(Commands, "sudo");
         if (StrValid(p_Path))
         {
@@ -70,6 +71,7 @@ char *RunCommand(char *RetStr, const char *Command, int Flags)
             if (! StrValid(Settings.RootPassword)) QueryRootPassword("~eOperation requires sudo (usually user's) password~0\r\nPassword: ");
         }
         else
+*/
         {
             p_Path=GetVar(Commands, "su");
             if (StrValid(p_Path))

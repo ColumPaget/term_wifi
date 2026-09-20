@@ -63,12 +63,22 @@ void PidFileKill(const char *AppName)
 void QueryRootPassword(const char *Prompt)
 {
     STREAM *S;
+    char *Line=NULL;
+		const char *ptr;
 
     S=STREAMFromDualFD(0,1);
-    Settings.RootPassword=TerminalReadPrompt(Settings.RootPassword, Prompt, TERM_SHOWSTARS, S);
+		ptr=GetToken(Prompt, "\n", &Line, GETTOKEN_APPEND_SEP);
+		while (StrValid(ptr))
+		{
+		TerminalPutStr(Line, S);
+		ptr=GetToken(ptr, "\n", &Line, GETTOKEN_APPEND_SEP);
+		}
+    Settings.RootPassword=TerminalReadPrompt(Settings.RootPassword, Line, TERM_SHOWTEXTSTARS, S);
     StripCRLF(Settings.RootPassword);
     TerminalPutStr("\r~>~0", S);
+
     STREAMDestroy(S);
+		Destroy(Line);
 }
 
 int FrequencyToChannel(int freq)
