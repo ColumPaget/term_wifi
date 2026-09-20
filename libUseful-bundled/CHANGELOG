@@ -1,0 +1,441 @@
+v5.80
+  * fix some lint found with cppcheck
+  * fix compile issue with --enable-capabilities
+  * add 'appendenv' function
+
+v5.79 (2026-08-26)
+  * Smtp: do HELO/EHLO again after STARTTLS
+  * Smtp: introduce 'ViaServer' functions that allow specifying ServerURL in function call
+  * FormatDuration now supports 'high+1'
+
+v5.78 (2026-08-26)
+  * mcast: stream type for multicast UDP added
+  * don't set 'keepalive' on udp sockets
+  * Linux Capabilities subsystem reworked to allow capabilites to be inherited and kept across user switch
+  * SMTP module can now be compiled-out at runtime
+  * SMTP now supports LU_SMTP_NO_TLS, LU_SMTP_STARTTLS and LU_SMTP_TLS_IMPLICIT flags
+  * Server sockets now have a 'nohandshake' or '2StepAccept' option.
+  * TLS/SSL certificate chains can now be setup using either 'ssl_cert_set0_chain' or the older 'SSL_CTX_add_extra_chain_cert'
+  * added 'auto' and 'high' options to FormatDuration
+  * ProcessApplyConfig 'strict' mode now applies to capabilites switch and seccomp
+
+
+v5.77 (2026-08-02)
+  * timeout implemented for DoSSLServerNegotiation
+  * ToSIUnit, ToMetric and ToIEC now support negative precision values that specify 'prefer higher unit'
+  * compile fixes for compiling without ssl and without containers
+  * added "check.sh" script to test compile scenarios
+
+
+v5.76 (2026-07-17)
+  * shutdown TLS/SSL connections properly with 'SSL_shutdown'
+  * TLS/SSL certificates and keys can now be held in memory (and so passed to chrooted apps that cannot read these files)
+
+
+v5.75 (2026-06-19)
+  * added rlimit syscalls to seccomp system
+  * following options now supported within the 'security=' stanza of ProcessApplyConfig: w^x, w^x:inherit, w^x:hard, w^x, w^x:inherit, w^x:hard, nosu, nopriv, noprivs
+  * added 'noptrace' security option
+  * move 'rlimit' setup to late stage of process apply config, so it will work right if we're in a container, call 'setsid', etc
+  * 'procs' or 'nproc' option in ProcessApplyConfig requires pid namespaces now
+  * 'uprocs' option replaces procs as system-wide user processes
+ 
+v5.74 (2026-06-13)
+  * fix issues with detecting compiler options on some compilers
+  * added support for gcc -fharden
+  * fix 'transparent proxy' never being compiled in
+  * return number of chars written by 'TerminalPutChar' and 'TerminalPutStr'
+
+v5.73 (2026-06-09)
+  * remove lazy 'try unmount any mounts' in FilesystemRmDir, as this is now incompatible with seccomp
+  * added 'LibUsefulCheckVersion' function
+  * revoke trying to match binding ports > 0, bind uses a sockaddr structure
+  * ProcessApplyConfig security modifier 'basic-net' had an issue that caused locking process into a net container
+  * add common 'user' ioctls to things seccomp recognizes
+  * handle 'non-existent' constants in seccomp (e.g. system lacks FIONASYNC)
+  * 'nopid' and pid containers now works more correctly
+  * add 'noinit' ProcessApplyConfig argument
+  * always call 'LookupIP' before enabling any type of MDWE so that resolver libraries are loaded
+  * 'debug' argument now supported by ProcessApplyConfig 
+
+
+v5.72 (2026-05-02)
+  * add "GetBacktrace" function
+  * add "basic-net" security modifier
+  * add more address families to seccomp matches for the "socket" and other system calls
+  * add 'mdwe:hard' option for ProcessApplyConfig: if mdwe isn't available, try using seccomp to achive the same.
+  * add seccomp match for "bind" with ports > 0 to seccomp group "server"
+  * 'configure' check whether BPF_JLT exists. Disable seccomp build if not.
+  * 'configure' check whether SECCOMP_RET_LOG exists. Disable that seccomp feature if not.
+  
+v5.71 (2026-04-18)
+  * honor 'stderr2null' when running commands
+  * added 'security=lan' for ProcessApplyConfig to limit all socket connections to 'non-routed' local ips
+  * fix edge case in 'SelectWait' causing hangs in some apps
+
+v5.70 (2026-04-01)
+  * limit direct use of 'select' syscall, replace with FDSelect instead (means more use of poll when supported, rather than select)
+  * catch filedescriptors < 0 passed to FDSelect et al
+  * add debug print on STREAMOpen and STREAMClose
+
+v5.69 (2026-04-01)
+  * fix issue with 'SSHClose' not being called correctly when writing files over ssh
+
+v5.68 (2026-02-26)
+  * honor stderr2null in 'Spawn' commands
+  * pmatch now supports {n} matches
+
+v5.67 (2026-02-26)
+  * Fix build issues on linux systems lacking MS_REC mount option
+  * Fix some issues with timeouts when using linux 'poll' syscall
+  * STREAMSelect now supports epoll 
+  * STREAMSelect now removes STREAMS from lists when stream is closed
+  * Fix bug in STREAMSelect when using 'select' with more than 1024 file descriptors
+  * Added 'ListMoveEnd' and 'ListMoveStart' functions
+  * Make sure STREAMIsConnected can only return 'TRUE' or 'FALSE', not 'SOCK_CONNECTING' etc
+  
+v5.66 (2026-01-22)
+  * Add XtermStringBase64Command to Terminal.h, as this prevents libUseful-lua from building
+  * GeoIP and ExternalIP systems reworked, now all sources are specified in ip-lookup.conf
+  * Dequote any quoted strings before adding them to a TerminalMenu
+
+v5.65 (2025-12-29)
+  * Minor fix for IP6 connections
+
+v5.64 (2025-12-10)
+  * Guard ssl_accept with 'STREAMWaitForBytes' to prevent eternally waiting for client that doesn't do SSL handshake
+  * Fixes for CMON object notation, document it's details in DataParser.h
+  * Handle arrays in XML export
+  * give array items in dataparser the names 'item:0', 'item:1'...'item:x', but don't export those names in JSON or CMON
+
+v5.63 (2025-11-14)
+  * Add RecursiveFindFilesInDir  RecursiveFindFilesInPath function
+  * Ensure TLS1.2 is the default TLS level
+
+v5.62 (2025-10-28)
+  * add CompareStrLen and CompareStrLenNoCase functions
+  * add ReadFile function
+  * Protect some unprotected strcmp and strncmp calls
+  * fix or at least handle openssl deprecations around ECHD and DH curves
+
+v5.61 (2025-10-22)
+  * stop trying to use external bzip to decode gzip files when libgzip not compiled in
+  * add more unicode symbols
+  * Add 'ListRotate' function
+  * Use ip-lookup.conf config file rather than hard-coded list of sites to get external ip
+  * add .gitignore file
+
+v5.60 (2025-09-13)
+  * keep searching for named item in list, even after encountering items with null names
+  * hopefully compile against old versions of openssl/libressl that lack X509_get0_notBefore
+
+v5.59 (2025-07-26) 
+  * Honor ttl and tos settings for server sockets
+  * Added IP4Mask/IP4MatchesMask etc functions in IPAddress.c
+  * Fix some openssl logging issues
+
+v5.58 (2025-07-02)
+  * Fix unguarded PR_MDWE_NO_INHERIT in Process.c. Not all linux kernels/headers have this flag.
+  * Added TERM_NEWLINE flag so TerminalReadPrompt can go to a newline after entry if desired
+  * Add TextPrompt theming
+  * Many improvements to PasswordFile.c including file locking, credential deletion, handle 'bad' chars in username, password and extra
+
+v5.57 (2025-06-16)
+  * Fix unguarded 'mount' in Container.c that prevents compile on non-linux platforms
+  * Add FindFileInPathSubDirectory, FindFilesInPathSubDirectory and FindFileInPrefixSubDirectory search functions to FileSystem.c
+  * Search harder for unicode-names.conf file using FindFileInPrefixSubDirectory 
+  * Optimise unicode names lookup support so we don't scan through unicode-names.conf for every character we lookup
+  * Add nerdfonts support using nerdfont.csv downloaded from  https://github.com/8bitmcu/NerdFont-Cheat-Sheet
+
+v5.56
+  * ditch attempted 'luarocks' support
+  * set STREAM->Size for http streams from Content-Length
+  * Fix unguarded 'unshare' in Containers.c preventing compile on systems that don't have that call (thanks again to barracuda156@github.com)
+  * Fix possible underflow in 'memset' in TerminalReadTextWithPrefix if typed string is zero length
+
+
+v5.55 (2025-05-28)
+  * use 'listen' on all server sockets. We've been getting away without it all these years.
+  * honor both 'TodayAttribs' and any 'StateAttribs' for a day in TerminalCalendar, so current day is always highlighted
+  * ListStats now stores 'AccessTime' if LIST_FLAG_TIMEOUT is not set
+  * ListSetMaxItems function added
+  * ListSetDestroyer function added
+  * ContainersApplyConfig now automatically switches to a 'user namespace' is current uid is not 0 (user is not root)
+  * ProcessApplyConfig 'security=nonet' now uses namespaces in addition to seccomp in order to limit network acccess
+  * externalize StrLenCacheInit function
+  
+
+v5.54 (2025-05-13)
+  * better debugging/error display for OpenSSL operations
+  * add more '--enable-harden' compiler flags
+
+v5.53 (2025-05-12)
+  * fix 'GetCertificateValue' function that's preventing compilation without openssl
+  * do not include 'bind' in 'server functions' in seccomp: binding to port 0 is needed in client mode and seccomp cannot see into a sockaddr object
+  * ongoing saga of MacOS support continues
+
+v5.52 (2025-05-11)
+  * Yet more work on MacOS compilation
+  * More work on seccomp, new seccomp 'levels' and 'modifiers' added
+  * added StringListToUnique function
+
+v5.51 (2025-05-03)
+  * Support 'inner text' within terminal progress bars
+  * Add more compiler-hardening options for ./configure --enable-harden 
+  * Make sure non-lgpl licensed parts are not compiled in, rather than just not called, if compiled with --enable-lgpl
+  * More changes from barracuda156@github.com for compiling on MacOS
+
+v5.50 (2025-04-12)
+  * Add TerminalCalendarSetDateStrState
+  * Add strcount
+
+v5.49 (2025-04-11)
+  * Fix issue with List/Map overlooking first item in list
+  * Added support to ProcessApplyConfig for "W^X" "memory deny write execute" using prctl on linux
+  * Added StripStartEndChars function in String.c
+
+v5.48 (2025-04-08)
+  * Add STREAM_TCP_ACCEPT and STREAM_UNIX_ACCEPT (server connections) to sendfile support
+  * Prevent use of sendfile on streams that become TLS/SSL via a 'STARTTLS' type method
+
+v5.47 (2025-04-06)
+  * Limit types of output stream we can use the 'sendfile' syscall with
+  * Reintroduce 'LICENSE' file in the hope that github detects it
+
+v5.46 (2025-03-28)
+  * Bugfix for 'eternal loop' when using OAuth and authentication fails
+  * Bugfix for 'STREAMCommit' not flushing all types of streams
+  * Added more OSINFO lookups (e.g. OSINFO_PAGESIZE)
+  * Autotools improvements from polynomial-c@github.com
+  * Ensure all .h files have 'extern "C"'
+  * License change to GPL or LGPL, depending on how libUseful is built (--enable-lgpl configure option added)
+
+v5.45 (2025-03-16)
+  * Bugfix for file compression autodetection
+
+v5.44 (2025-03-16)
+  * Changes from barracuda156@github.com for compiling on MacOS
+
+v5.43 (2025-03-15)
+  * More work on tidying up linked-lists implementation
+  * If a variable list/map is declared with 'LIST_FLAG_UNIQ' then assume items are added to the variable list only once, and don't try to look up previous items to replace them (big speed increase)
+  * Support using lzip application for compession/decompression of streams
+  * Add STREAMDetectCompression and compression autodetection for streams and files
+
+v5.42 (2025-03-08)
+  * Make StrUnsafeTrunc a bit safer, by checking string is not null
+  * Add 'daystate' feature to TerminalCalendars
+
+v5.41 (2025-03-06)
+  * Fix another crash in List.c
+  * Use CompareStrNoCase in preference to strcmp and strcasecmp in a few places.
+
+v5.40 (2025-03-06)
+  * Add 'binary' encoding
+  * Avoid use of 'SetStrLen' in stream/binary functions to avoid polluting the StrLen cache
+  * Fix bug in ListFindNamedItemInsert returning unset 'Prev' variable (revealed by using -O0 to turn off optimizations)
+  * Added 'StringListAdd' and 'StringListAddUnique' functions
+  * Don't use '+' as padding for xxencode
+  * Fix 'trailing bytes' on all base32 encodings
+
+
+v5.39 (2025-02-15)
+  * Fix issue with STREAMReadBytes returning 'STREAM_CLOSED' too early
+  * Changes to use TerminalCalendar in libUseful-lua
+
+v5.38 (2025-02-14)
+  * Fixes for LineEdit in TerminalReadPrompt
+  * TerminalReadPromptWithPrefix now accepts a history list
+  * Ensure that data between XML tags that ends in '/' isn't mistaken for a close tag
+
+v5.37 (2025-02-09)
+  * TCP Quickack support added and used as default in HTTP Get
+  * 'Full flush' option added to file and TCP, using fsync with files and pipes and disabling Nagle's algorithm for TCP
+  * 'Ordered List' functionality in List.c simplified/repaired
+  * When writing to pipes in STREAMs honor the PIPE_BUF constant if declared
+  * Added RAWDATAMove and RAWDATATrunc functions to enable using RAWDATA as a fifo
+  * Websocket client connection ceases to be experimental
+  * Added 'STREAMReadMessage' to handle websocket messages
+  * STREAMReadDocument now uses STREAMReadMessage and is the user interface to websocket messages
+  * Removed 'insert line feeds between websocket messages' testing bodge
+  * ditch __builtin_prefetch in List.c, once upon a time it seemed to give a benefit, but not now
+
+v5.36 (2025-02-04)
+  * Restructure XMLGetTag and ensure whitespace is preserved in data between tags
+  * Properly implement 'websocket frame too big', closing connection when this happens
+  * Websocket code no longer outputs http debugging.
+  * Handle prompt/prefix in new 'LineEdit' based TerminalReadLine 
+  * Ensure CopyStr/CatStr return allocated memory even if both dst and src start as null
+  * Handle 'Stolen characters' after unicode in TerminalPutStr
+  * More work on LineEdit.c
+
+v5.35 (2025-02-1)
+  * Added LineEdit.c for full line editing with history
+  * Handle 'bigframes' in Websocket.c
+  * Add bech32 encoding
+
+v5.34 (2025-01-23)
+  * Fixes for parsing unicode in 'UnQuoteStr'
+  * Handle NULL URL passed to 'STREAMOpen'
+  * Added function 'VarsFromNameValueList' to Vars.c
+
+v5.33 (2025-01-10)
+  * Keep '/' in XML tag data, in order to detect <tag /> as end tags
+  * Added 'XMLIsEndTag' function
+
+v5.32 (2025-01-07)
+  * Added 'SetNumericVar' and 'AddToNumericVar' functions in Vars.c
+  * Added 'IsLeapYear' function in Time.c
+  * Added 'GetDaysInMonth' function in Time.c
+  * Added 'CalendarFormatCSV' function in Time.c
+  * Added TerminalCalendar widget
+  * Fix issue in PasswordFile.c where 'Extra' data can get appended to password when doing password check
+
+v5.31 (2024-12-20)
+  * Added 'FormatDuration' function
+  * Added STREAMGetDestination function
+  * Fixes for udp and bcast socket types
+
+v5.30 (2024-10-29)
+  * Fix crash if TerminalTextAlign has NULL for the Terminal
+  * Added HttpGet and HttpPost functions
+  * Improvements to httpserver authentication. 
+  * Add 'extra' field to passwords file to allow storing data against a user.
+
+v5.29 (2024-10-29)
+  * much more seccomp work
+  * add 'data' option to pty config (PtyParseConfig) so if a pipe or pty is going to be used for raw data transfer, use FLUSH_ALWAYS not FLUSH_LINE
+  * support uuencoded data using either ' ' or '`' as 1st char of alphabet
+  * add support for yenc encoded data
+
+v5.28 (2024-10-21)
+  * added seccomp support, and process security levels
+  * change SS_ stream state values to LU_SS_ to prevent clashes with linux defines like SS_CONNECTING
+  * fixes for rbase64 encoding. added name 'rbase64' and decoding this encoding now works
+
+v5.27 (2024-10-16)
+  * honor timeout for connect, not just for read  
+  * added 'autorecover' feature to file STREAMS
+  * fix issues with parsing RSS feeds (some tags could have whitespace or other text prepended to them)
+
+v5.26 (2024-09-07)
+  * Fix incorrect addition of 'progress' and 'remain' to options of non-progress-bar terminal widgets.
+  * Make sure all DataProcessorInit functions fit the new function prototype.
+  * TerminalChooser now honors the 'width' setting, and intelligently fits itself into that
+
+v5.25 (2024-08-31)
+  * Symmetric Encryption now supported for STREAMs
+  * Handle situation where logfile is rotated under an app that has it open
+  * Stop trying to rotate hardened logfiles. rotate is incompatible with append-only files
+
+v5.24 (2024-08-20)
+  * Move namespace/container code to Containers.c and make general improvements
+  * Exit out of TerminalReadText if escape or ctrl-c entered
+  * Added 'l' option (list files on remote server) to SSH streams
+  * CHANGED ARGUMENTS TO SSHConnect AND SSHOpen
+  * ssh streams can now accept config options bind=<address> and config=<path>
+  * Rotate logfiles even if not open by app
+
+v5.23 (2024-07-26)
+  * Improve attribution of base64 and hashing functions
+  * fix -net/nonet (flag meaning was inverted)
+  * ProcessNoNewPrivs now handles 'already set' and is no longer static. 
+  * Call setsid before setting controlling tty in PtySpawnFunction
+  * added CGIReadDocument
+
+v5.22
+  * fix clash of flags between PROC_NO_NEW_PRIV and PROC_NOSHELL
+
+v5.21
+  * replaced 'exit if can't chroot/chdir' with 'strict' option to ProcessApplyConfig
+  * Added ERRFLAG_ABORT to error handling functions, aborts the process after reporting the error
+  * Added ERRFLAG_SYSLOG to error handling functions, forces syslog even if library-wide syslog flag isn't set
+  * MakeShellSafeStr now quotes/blanks out '$' in addition to other dangerous characters
+  * MakeShellSafeStr can now report unsafe characters via syslog if the SHELLSAFE_REPORT flag is passed
+  * MakeShellSafeStr can now abort program if the SHELLSAFE_ABORT flag is passed and unsafe chars are found
+  * FileMoveToDir will now copy the file if a simple rename fails
+  * Negative values for width and height on TerminalMenu and TerminalProgress set width as 'terminal width minus that value'
+
+
+v5.20 (2024-07-11)
+  * Added  TOTPAtTime and TOTPPrevCurrNext
+
+v5.19 (2024-07-09)
+  * Added 'nosu', 'noprivs' options to 'ProcessApplyConfig' that prevent a process escalating priviledges via su/sudo/setuid
+  * check for prctl properly using './configure'
+  * Eliminate use of 'fopen' in 'GetHostARP'
+  * General cleanup of 'ProcessApplyConfig'
+  * If chdir or chroot fail in 'ProcessApplyConfig' print "too dangerous to continue" and exit
+
+v5.18 (2024-07-01)
+  * FindFileInPath now returns a real file, rather than symlink, unless a symlink is all it can find (now it really does).
+  * Clean up some errors revealed by -Wall
+
+v5.17 (2024-06-30)
+  * FindFileInPath now returns a real file, rather than symlink, unless a symlink is all it can find.
+  * Added TerminalPrint function.
+
+v5.16 (2024-06-26)
+  * handle http digest authentication
+  * add 'AppendVar' function
+
+v5.15 (2024-06-20)
+  * add/fix support for calling hmac functions via the Hash interface
+  * use of openssl hashing functions no longer experimental
+  * support sha384 hash
+  * Added 'UnpackURL' function
+
+v5.14 (2024-06-03)
+  * add ini file support to DataParser
+  * fix/add 'bcast' socket type
+
+v5.13 (2024-04-17)
+  * Fix soname issue. 
+
+v5.12 (2024-04-06)
+  * Added TerminalProgress progress bars
+  * Fix ~W escape sequence for setting white background
+  * Fixes to TerminalTheme
+
+v5.11 (2024-02-27)
+  * Don't follow symbolic links in FileSystemRmDir
+  * detect NULL streams passed to STREAMReadToTerminator 
+  * honor prefix/sysconfdir when open unicode-names.conf 
+  * STREAMSendDgram added to Stream.h
+  * clean out example .exe files with 'make clean'"
+
+v5.10 (2024-02-21)
+  * Added 'x' (O_EXCL) option to file streams
+  * Added ''GetUserHomeDir' function
+  * Install now creates symlinks from libUseful-<major> to libUseful-<major>-<minor> rather than making two directories as suggested by andreasstieger@github.com
+  * Added soname to library when building under gcc, again as suggested by andreasstieger@github.com
+
+v5.9 (2024-02-07)
+  * Fix more build errors when building without openssl
+  * added options for compiling with -Wall, -Werror, FORTIFY_SOURCE and -fstack-protector to ./configure 
+
+v5.8 (2024-01-15)
+  * Fix build error when building without openssl
+  * Give in to autoconf insisting upgrade to modern format
+
+v5.7 (2024-01-15)
+  * Fix base32 misunderstanding
+  * Tidyups suggested by andreasstieger@github.com, including flags not returned by ProcessApplyLateConfig.
+  * libcapabilites support now defaults to 'no' 
+
+v5.6 (2024-01-14)
+  * TOTP function added
+  * base32 decode functions now return length
+
+v5.5 (2024-01-13)
+  * Base32 encoding schemes added
+  * binary-coded-decimal functions added in GeneralFunctions.c
+  * fixes for gzip encode/decode in streams
+  * fixes for issues with IP6
+  * use 'sys/wait.h' instead of 'wait.h'
+  * fixes/improvements for 'PipeSpawn'
+  * copy file permissions when FileCopy
+  * handle SUPER key in terminal functions
+  * lots of work on OAuth and experimental websocket and http servers
+
+
